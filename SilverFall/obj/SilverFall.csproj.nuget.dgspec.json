@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj": {}
+    "c:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj": {
+    "c:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj",
+        "projectUniqueName": "c:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj",
         "projectName": "SilverFall",
-        "projectPath": "C:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj",
+        "projectPath": "c:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\SilverFall.csproj",
         "packagesPath": "C:\\Users\\Igor\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\obj\\",
+        "outputPath": "c:\\Users\\Igor\\Documents\\VS Code\\SilverFall\\SilverFall\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Igor\\AppData\\Roaming\\NuGet\\NuGet.Config"
