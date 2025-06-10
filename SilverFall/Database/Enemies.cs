@@ -17,11 +17,11 @@ namespace Game.Enemies
             },
             "Zombie",
             1,
-            Game.Items.Database.Claymore,
+            Items.Database.Claymore,
             "Zombie",
-            new LootTable("Zombie", 3)
+            new LootTable("Zombie", GameRandom.Instance.Next(2, 4))
         );
-
+        
         public static Enemy Goblin = new Enemy(
             new Stats()
             {
@@ -34,9 +34,9 @@ namespace Game.Enemies
             },
             "Goblin",
             1,
-            Game.Items.Database.ShortSword,
+            Items.Database.ShortSword,
             "Goblin",
-            new LootTable("Goblin", 4)
+            new LootTable("Goblin", GameRandom.Instance.Next(2, 4))
         );
 
         public static Enemy Orc = new Enemy(
@@ -51,9 +51,9 @@ namespace Game.Enemies
             },
             "Orc",
             1,
-            Game.Items.Database.BattleAxe,
+            Items.Database.BattleAxe,
             "Orc",
-            new LootTable("Orc", 5)
+            new LootTable("Orc", GameRandom.Instance.Next(2, 4))
         );
 
         public static Enemy Dragon = new Enemy(
@@ -68,9 +68,9 @@ namespace Game.Enemies
             },
             "Dragon",
             3,
-            Game.Items.Database.DragonClaw,
+            Items.Database.DragonClaw,
             "Dragon",
-            new LootTable("Dragon", 4)
+            new LootTable("Dragon", GameRandom.Instance.Next(2, 4))
         );
     }
 }

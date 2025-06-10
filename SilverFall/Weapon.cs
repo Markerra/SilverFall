@@ -1,8 +1,5 @@
 namespace Game
 {
-
-    using Game.Items;
-
     class Weapon : Equipment
     {
         public WeaponStats Stats { get; set; }
@@ -62,9 +59,49 @@ namespace Game
             // Default: no special effect
         }
 
-        public void CastSpell(Spell spell)
+        public bool CastSpell(Entity target)
         {
-            
+            if (target == null)
+            {
+                GameLog.Write("CastSpell() failed: target is null.");
+                return false;
+            }
+            GameLog.Write($"\n{GameManager.Player.Name} casted {Name} on {target.Name}");
+            List<ConsoleKey> combo = new List<ConsoleKey>();
+            // пройтись по списку спеллов и сравнить первую клавишу с spell.KeyCombo[0]
+            int maxChars = 6;
+            var key = Console.ReadKey().Key;
+            foreach (Spell spell in SpellsList.Spells)
+            {
+
+                
+                // if user input equals spell combo then cast the spell
+                GameLog.Write("CastSpell() Checking if user input equals spell combo then cast the spell");
+                if (combo.SequenceEqual(spell.KeyCombo))
+                { spell.Cast(Owner, target); return true; }
+                // if not, then wait user input..
+                else
+                {
+                    for (int i = 0; i < maxChars;)
+                    {
+                        GameLog.Write($"CastSpell() Checking if {spell.KeyCombo[i]} equals to {key}");
+                        if (spell.KeyCombo[i] == key)
+                        {
+                            maxChars = spell.KeyCombo.Length;
+                            combo.Add(key);
+                            key = Console.ReadKey().Key;
+                            i++;
+                        }
+                        else
+                        {
+                            GameLog.Write($"CastSpell() Incorrect spell! Key: {key}, Current Combo: {string.Join("", combo)}, Expected: {string.Join("", spell.KeyCombo)}");
+                            break;
+                        }
+                    }
+                }
+            }
+            GameLog.Write("CastSpell() failed: No matching spell found.");
+            return false;
         }
     }
 
@@ -73,14 +110,15 @@ namespace Game
 
         public static List<Weapon> Weapons { get; set; } = new List<Weapon>
         {
-            Database.ShortSword,
-            Database.Katana,
-            Database.Claymore,
-            Database.Excalibur,
-            Database.WoodenBow,
-            Database.ShortBow,
-            Database.ElvenBow,
-            Database.Longbow
+            Items.Database.ShortSword,
+            Items.Database.Katana,
+            Items.Database.Claymore,
+            Items.Database.Excalibur,
+            Items.Database.WoodenBow,
+            Items.Database.ShortBow,
+            Items.Database.ElvenBow,
+            Items.Database.Longbow,
+            Items.Database.MagicWand,
         };
 
 

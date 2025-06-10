@@ -122,20 +122,23 @@ namespace Game
                 throw new ArgumentException("The item list cannot be null or empty.");
             }
 
-            if (RarityCheck)
+            if (RarityCheck) // Gets random item and incude item's chances
             {
                 while (true)
                 {
                     Item item = items[GameRandom.Instance.Next(0, items.Count)];
                     if (GameRandom.Instance.Next(0, 100) < Item.RarityChances[item.Rarity])
                     {
+                        GameLog.Write($"Picked random item from {GameLog.ItemListToString(items)} with rarity check. Got {item}");
                         return item;
                     }
                 }
             }
             else
             {
-                return items[GameRandom.Instance.Next(0, items.Count)];
+                Item item = items[GameRandom.Instance.Next(0, items.Count)];
+                GameLog.Write($"Picked random item from {GameLog.ItemListToString(items)} without rarity check. Got {item.Name}");
+                return item;
             }
         }
 
