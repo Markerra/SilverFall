@@ -81,7 +81,7 @@ namespace Game
             Database.ShortBow,
             Database.ElvenBow,
             Database.Longbow
-        };
+Zz        };
 
 
         public static Weapon GetRandomWeapon(bool RarityCheck = true)
