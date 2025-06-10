@@ -8,10 +8,11 @@ namespace Game.UI
 
         public static void Show()
         {
-            if (GameSave.LoadGame() is GameSave) // If save file exists - show Continue button
+            GameSave save = GameSave.LoadGame();
+            if (save.Stage >= 0) // If player started new game - show Continue button
             {
                 Console.Clear();
-                Console.WriteLine("=======SILVERFALL=======\n");
+                Console.WriteLine($"======={GameInfo.Name}=======\n");
                 Console.WriteLine("1. Continue");
                 Console.WriteLine("2. New Game");
                 Console.WriteLine("3. Options");
@@ -71,7 +72,7 @@ namespace Game.UI
             else // No game save detected - default menu
             {
                 Console.Clear();
-                Console.WriteLine("=======SILVERFALL=======\n");
+                Console.WriteLine($"======={GameInfo.Name}=======\n");
                 Console.WriteLine("1. New Game");
                 Console.WriteLine("2. Load Game");
                 Console.WriteLine("3. Options");
@@ -119,10 +120,10 @@ namespace Game.UI
             Console.WriteLine($"2. Dev Mode ({GameOptions.isDev})");
             if (GameOptions.isDev)
             {
-                Console.WriteLine($"-------Dev-------");
+                Console.WriteLine($"-----------Dev-----------");
                 Console.WriteLine($"D. Delete your save file");
-                Console.WriteLine($"E. ");
-                Console.WriteLine($"-------Dev-------");
+                Console.WriteLine($"E. Test Feature");
+                Console.WriteLine($"-----------Dev-----------");
                 
             }
             Console.WriteLine("3. Return");
@@ -136,6 +137,12 @@ namespace Game.UI
                     break;
                 case "2":
                     GameOptions.isDev = !GameOptions.isDev;
+                    Console.Clear(); Console.Write("Please wait");
+                    Timer loading = LoadingDots(40);
+                    loading.Start();
+                    new GameSave().SaveGame();
+                    Thread.Sleep(120); // Simulate loading
+                    loading.Stop();
                     Options();
                     break;
                 case "3":
@@ -156,7 +163,7 @@ namespace Game.UI
         public static void CreateSaveFile()
         {
             Console.Clear();
-            Console.WriteLine("Creating Save File..");
+            Console.WriteLine("Creating Save File (#1)");
             Console.Write("\n >> Enter your Name: ");
             string name = Console.ReadLine() ?? "";
             while (string.IsNullOrWhiteSpace(name))
@@ -166,6 +173,7 @@ namespace Game.UI
             }
 
             Console.Clear();
+            Console.WriteLine("(#2) Creating Save File");
             int seed = GameRandom.GenerateSeed();
             if (GameOptions.setSeed)
             {
@@ -175,6 +183,8 @@ namespace Game.UI
                 {
                     while (!int.TryParse(input, out seed))
                     {
+                        Console.Clear();
+                        Console.WriteLine("(#2) Creating Save File");
                         Console.Write("Invalid number entered. \n >> Enter your Seed (leave blank for random): ");
                         input = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(input))
@@ -202,22 +212,24 @@ namespace Game.UI
             }
             Console.SetCursorPosition(0, top + 1);
             Console.Clear();
+            Console.WriteLine("(#2) Creating Save File");
             Console.WriteLine($"Your seed: \n{seed}");
             Console.WriteLine(" >> Press any key to continue...");
             Console.ReadKey();
+            Console.Clear();
+
+            // Show loading dots
+            Console.Write("(#3) Creating Save File");
+            Timer loading = LoadingDots(100);
+            loading.Start();
 
             GameStage.CurrentStage = 0;
             Player player = new Player(new Stats(), name);
-            GameSave save = new GameSave(name, seed, player, GameStage.CurrentStage);
+            GameSave save = new GameSave(name, seed, player, GameStage.CurrentStage, GameOptions.isDev);
             GameSave.StartNewGame(save);
             save.SaveGame();
-            
-            // Show loading dots
-            Console.Clear();
-            Console.Write("Creating Save File");
-            Timer loading = LoadingDots(100);
-            loading.Start();
-            Thread.Sleep(1000); // Simulate loading
+
+            Thread.Sleep(800);
             loading.Stop();
         }
 

@@ -34,15 +34,16 @@ namespace Game
         public int Level { get; set; } // Level increases all stats by 11% per level
         public Stats Stats { get; set; }
         public Dictionary<string, Equipment?> Equipment { get; set; }
+        public List<Spell> SpellBook { get; set; }
         public List<Item> Inventory { get; set; }
         public event Action<Entity>? OnDeath;
         public event Action? OnLevelUp;
         public Entity(Stats stats, string name, int level)
         {
-            this.Stats = stats;
-            this.Name = name;
-            this.Level = level;
-            this.Equipment = new Dictionary<string, Equipment?>
+            Stats = stats;
+            Name = name;
+            Level = level;
+            Equipment = new Dictionary<string, Equipment?>
             {
                 { "Head", null }, // 0
                 { "Chest", null }, // 1
@@ -54,7 +55,8 @@ namespace Game
                 { "Weapon", null }, // 7
                 { "Other", null } // 8
             };
-            this.Inventory = new List<Item>();
+            Inventory = new List<Item>();
+            SpellBook = new List<Spell>();
         }
 
         public void TakeDamage(float damage, Entity attacker)
@@ -239,23 +241,31 @@ namespace Game
         }
 
         // Base defense, can be increased by items. Absorbs a percentage of incoming damage
-        public float Defense { get; set; } = 0;
+
+        private float defense { get; set; }
+        public float Defense
+        {
+            get { return Math.Clamp(defense, 0, 100); }
+            set { defense = value; }
+        }
 
         // Additional stats
 
+        private float missChance;
         public float MissChance
         {
-            get { return Math.Min(Agility * 0.01F, 80); }
-            set { return; }
+            get { return missChance + Math.Min(Agility * 0.01F, 80); }
+            set { missChance = Math.Clamp(value, 0, 100); }
         }
 
+        private float critChance;
         public float CritChance
         {
-            get { return Agility * 0.01F; }
-            set { return; }
+            get { return critChance + (Agility * 0.01F); }
+            set { critChance = Math.Clamp(value, 0, 100); }
         }
 
-        public Stats() {}
+        public Stats() { }
 
         public Stats(int str, int agi, int intell, int hp, int hpRegen, int mana, int manaRegen, float crit, float miss)
         {
@@ -275,11 +285,12 @@ namespace Game
             Strength += other.Strength;
             Agility += other.Agility;
             Intelligence += other.Intelligence;
-            Health += other.Health;
-            Mana += other.Mana;
-            HealthRegen += other.HealthRegen;
-            ManaRegen += other.ManaRegen;
-            Defense += other.Defense;
+            maxHealth += other.maxHealth;
+            health += other.health;
+            mana += other.mana;
+            healthRegen += other.healthRegen;
+            manaRegen += other.manaRegen;
+            defense += other.defense;
         }
 
         public void RemoveStats(Stats other)
@@ -287,11 +298,12 @@ namespace Game
             Strength -= other.Strength;
             Agility -= other.Agility;
             Intelligence -= other.Intelligence;
-            Health -= other.Health;
-            Mana -= other.Mana;
-            HealthRegen -= other.HealthRegen;
-            ManaRegen -= other.ManaRegen;
-            Defense -= other.Defense;
+            maxHealth -= other.maxHealth;
+            health -= other.health;
+            mana -= other.mana;
+            healthRegen -= other.healthRegen;
+            manaRegen -= other.manaRegen;
+            defense -= other.defense;
         }
 
     }
@@ -320,7 +332,10 @@ namespace Game
         public Entity Player { get; set; }
         public int Stage { get; set; } // Current stage of the game
 
-        private static string fileName = "game_save.json";
+        public bool isDev { get; set; }
+        public string? Hash { get; set; } // Integrity hash
+
+        private static string fileName = "game_save";
 
         public GameSave()
         {
@@ -328,50 +343,110 @@ namespace Game
             Seed = 0;
             Player = new Player(new Stats(), Name);
             Stage = GameStage.CurrentStage;
+            isDev = GameOptions.isDev;
         }
-        public GameSave(string name, int seed, Entity player, int stage)
+        public GameSave(string name, int seed, Entity player, int stage, bool devMode)
         {
             Name = name;
             Seed = seed;
             Player = player;
             Stage = stage;
+            isDev = devMode;
+        }
+
+        // Check if save file isn't corrupted and valid by hash
+
+        private string ComputeHash(string json)
+        {
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                byte[] hashBytes = sha256.ComputeHash(bytes);
+                return Convert.ToBase64String(hashBytes);
+            }
+        }
+
+        public static bool IsValidSave(string json)
+        {
+            // Extract hash
+            using (JsonDocument doc = JsonDocument.Parse(json))
+            {
+                var root = doc.RootElement;
+                string? hash = root.TryGetProperty("Hash", out var hashProp) ? hashProp.GetString() : null;
+                // Remove hash for verification
+                var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                if (dict != null && dict.ContainsKey("Hash"))
+                    dict["Hash"] = string.Empty;
+                string jsonWithoutHash = JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true });
+                string computedHash = string.Empty;
+                using (var sha256 = System.Security.Cryptography.SHA256.Create())
+                {
+                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonWithoutHash);
+                    byte[] hashBytes = sha256.ComputeHash(bytes);
+                    computedHash = Convert.ToBase64String(hashBytes);
+                }
+                if (hash == null || hash != computedHash) { return false; }
+                else { return true; }
+            }
         }
 
         public void SaveGame()
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(this, options);
+            string? originalHash = Hash;
+            Hash = string.Empty;
+            string jsonWithoutHash = JsonSerializer.Serialize(this, options);
+            Hash = ComputeHash(jsonWithoutHash);
+            string jsonWithHash = JsonSerializer.Serialize(this, options);
+            Hash = originalHash; // Restore
             if (!Directory.Exists("saves")) { Directory.CreateDirectory("saves"); }
-            File.WriteAllText($"saves\\{fileName}", json);
+            File.WriteAllText($"saves\\{fileName}.json", jsonWithHash);
         }
 
-        public static GameSave? LoadGame()
+        public static GameSave LoadGame()
         {
-            string filePath = $"saves\\{fileName}";
+            string filePath = $"saves\\{fileName}.json";
             if (!File.Exists(filePath))
             {
                 new GameSave().SaveGame();
                 throw new FileNotFoundException("Save file not found. Restart the game.\n", filePath);
             }
             string json = File.ReadAllText(filePath);
-            Console.WriteLine("Game save was loaded succesefully");
             GameSave? save = JsonSerializer.Deserialize<GameSave>(json);
-            return save;
+            if (save == null) { throw new FileLoadException("Save file has not loaded succesfully"); }
+            GameOptions.isDev = save.isDev;
+            Console.WriteLine($"Dev Mode: {GameOptions.isDev}");
+            if (IsValidSave(json) || GameOptions.isDev)
+            {
+                Console.WriteLine("Passed integrity check");
+                return save;
+            }
+            else
+            {
+                DeleteSave(backup: true);
+                new GameSave().SaveGame();
+                throw new InvalidDataException("Game save file integrity check failed. The file may have been tampered with. Restart you game.");
+            }
         }
 
         public static void StartNewGame(GameSave saveFile)
         {
             GameRandom.SetSeed(saveFile.Seed);
+            Console.WriteLine("Starting new game..");
         }
 
-        public static void DeleteSave()
+        public static void DeleteSave(bool backup = false)
         {
-            string filePath = $"saves\\{fileName}";
+            string filePath = $"saves\\{fileName}.json";
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException("Save file not found.", filePath);
             }
-            else { File.Delete(filePath); }
+            else
+            {
+                if (backup) { File.Copy(filePath, $"saves\\{fileName}_backup.json", true); }
+                File.Delete(filePath);
+            }
         }
     }
 
@@ -386,6 +461,11 @@ namespace Game
         public static bool isDev;
 
 
+    }
+
+    static class GameInfo
+    {
+        public static string Name = "SILVERFALL"; 
     }
 
 }

@@ -12,3 +12,4 @@ c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\refint\Si
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.pdb
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.genruntimeconfig.cache
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\ref\SilverFall.dll
+c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.sourcelink.json

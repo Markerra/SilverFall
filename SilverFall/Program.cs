@@ -6,6 +6,7 @@
     {
         static void Main(string[] args)
         {
+            Console.Title = GameInfo.Name;
             UI.MainMenu.Show();
         }
     }

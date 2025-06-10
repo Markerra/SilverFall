@@ -1,8 +1,8 @@
 {
-  "Name": "Markerra",
-  "Seed": 1299985313,
+  "Name": "Player",
+  "Seed": 0,
   "Player": {
-    "Name": "Markerra",
+    "Name": "Player",
     "Experience": 0,
     "ExpTable": [
       0,
@@ -43,7 +43,7 @@
     },
     "Inventory": []
   },
-  "Stage": 0,
-  "isDev": false,
-  "Hash": "O5GW3QQ\u002BmsxANpN1JAE9Z6UZ7Bwp0VeXPd6hvOEGLVU="
+  "Stage": 1,
+  "isDev": true,
+  "Hash": "pyNjr8waW8vxOnt6oP\u002BfmXNGSsMBKExnAlSVeiD5Yfc="
 }

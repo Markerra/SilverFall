@@ -53,6 +53,21 @@ namespace Game
         }
     }
 
+    class MagicWand : Weapon
+    {
+        public MagicWand(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats) { }
+
+        public override void OnAttack(Entity attacker, Entity target)
+        {
+            // Default: no special effect
+        }
+
+        public void CastSpell(Spell spell)
+        {
+            
+        }
+    }
+
    static class WeaponsList
     {
 

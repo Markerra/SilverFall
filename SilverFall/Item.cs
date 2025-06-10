@@ -19,10 +19,10 @@ namespace Game
         public Action<Item>? Action { get; set; }
         public Item(string name, string description, string rarity = "Common", Action<Item>? action = null)
         {
-            this.Name = name;
-            this.Description = description;
-            this.Action = action;
-            this.Rarity = rarity;
+            Name = name;
+            Description = description;
+            Action = action;
+            Rarity = rarity;
         }
 
         public void Use()
