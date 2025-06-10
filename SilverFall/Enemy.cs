@@ -10,13 +10,35 @@ namespace Game
 
         public Enemy(Stats stats, string name, int level, Weapon weapon, string type, LootTable loot) : base(stats, name, level)
         {
-            this.Type = type;
-            this.Inventory = new List<Item>();
-            this.Inventory.Add(weapon);
-
-            this.Loot = loot;
-            this.OnDeath += (attacker) =>
+            Type = type;
+            Inventory = new List<Item> {weapon};
+            Loot = loot;
+            OnDeath += (attacker) =>
             {
+                // Generate new LootTable
+                Loot.Generate();
+
+                // Adds enemy's equipment to the loot table
+                foreach (string slot in Equipment.Keys)
+                {
+                    Equipment? equipment = Equipment[slot];
+                    if (equipment != null)
+                    {
+                        Loot.Items.Add(equipment);
+                    }
+                }
+
+                // Adds items from the enemy's inventory to the loot table
+                foreach (Item item in Inventory)
+                {
+                    if (item != null)
+                    {
+                        Loot.Items.Add(item);
+                    }
+                }
+
+                GameLog.Write($"{Name} has been killed by {attacker.Name}");
+
                 Console.WriteLine($"{Name} has been defeated!");
                 Console.WriteLine($"{attacker.Name} gained {Loot.Experience} experience points.");
                 Console.WriteLine($"{attacker.Name} found the following items:");

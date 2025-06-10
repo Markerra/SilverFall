@@ -6,6 +6,9 @@ namespace Game
         public int Experience { get; set; }
         public List<Item> Items = new List<Item>();
 
+        private string _type;
+        private int _amount;
+
         private static List<Item> GetLootForEnemy(string enemyType)
         {
             List<Item> lootTable = enemyType switch
@@ -26,36 +29,11 @@ namespace Game
                 _ => new List<Item> { ItemsList.GetRandomItem() }
             };
 
-            Enemy? enemy = EnemyList.FindEnemy(enemyType);
-
-            // Adds enemy's equipment to the loot table
-            if (enemy != null)
-            {
-                foreach (string slot in enemy.Equipment.Keys)
-                {
-                    Equipment? equipment = enemy.Equipment[slot];
-                    if (equipment != null)
-                    {
-                        lootTable.Add(equipment);
-                    }
-                }
-            }
-
-            // Adds items from the enemy's inventory to the loot table
-            if (enemy != null)
-            {
-                foreach (Item item in enemy.Inventory)
-                {
-                    if (item != null)
-                    {
-                        lootTable.Add(item);
-                    }
-                }
-            }
-
+            GameLog.Write($"Generated loot for {enemyType} - {GameLog.ItemListToString(lootTable)}");
 
             return lootTable;
         }
+
         private static int GetExpForEnemy(string enemyType)
         {
             return enemyType switch
@@ -70,11 +48,20 @@ namespace Game
 
         public LootTable(string enemyType, int amountOfItems)
         {
-            for (int i = 0; i < amountOfItems; i++)
+            _type = enemyType;
+            _amount = amountOfItems;
+            Generate();
+        }
+
+        public void Generate()
+        {
+            Items = new List<Item>();
+            for (int i = 0; i < _amount; i++)
             {
-                Items.Add(ItemsList.GetRandomItemFor(GetLootForEnemy(enemyType)));
+                Items.Add(ItemsList.GetRandomItemFor(GetLootForEnemy(_type)));
             }
-            Experience = GetExpForEnemy(enemyType);
+            Experience = GetExpForEnemy(_type);
+            GameLog.Write($"Generated loot table for {_type}. Items: {GameLog.ItemListToString(Items)}, Exp: {Experience}");
         }
     }
 }

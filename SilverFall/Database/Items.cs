@@ -2,10 +2,17 @@ namespace Game.Items
 {
     static class Database
     {
+
+    // Items
+    // ---------------------
+
+
+        // All Potions 
+        
         public static Item HealthPotion = new Item
         ("Health Potion",
         "Restores 50 health points.",
-        "Common", 
+        "Common",
         item =>
         {
             if (item != null)
@@ -14,6 +21,8 @@ namespace Game.Items
                 Console.WriteLine($"{item.Owner?.Name} used {item.Name} and restored 50 health points.");
             }
         });
+
+        // All Accesories / Trophies
 
         public static Item BronzeTrinket = new Item(
             "Bronze Trinket",
@@ -29,6 +38,8 @@ namespace Game.Items
             null
         );
 
+        // All Helmets
+
         public static Helmet IronHelmet = new Helmet(
             "Iron Helmet",
             "A sturdy iron helmet. Increases Strength and Defense.",
@@ -42,6 +53,8 @@ namespace Game.Items
             "Legendary",
             new Stats() { Strength = 10, Defense = 20, Agility = 2 }
         );
+
+        // All Chestplates
 
         public static Chestplate LeatherArmor = new Chestplate(
             "Leather Armor",
@@ -57,6 +70,8 @@ namespace Game.Items
             new Stats() { Strength = 5, Defense = 15, Agility = -2 }
         );
 
+        // All Leggings
+
         public static Leggings IronLeggings = new Leggings(
             "Iron Leggings",
             "Iron leggings that offer solid protection.",
@@ -70,6 +85,8 @@ namespace Game.Items
             "Rare",
             new Stats() { Agility = 7, Defense = 3 }
         );
+        
+        // All Boots
 
         public static Boots SwiftBoots = new Boots(
             "Swift Boots",
@@ -84,6 +101,8 @@ namespace Game.Items
             "Rare",
             new Stats() { Defense = 8, Agility = -3 }
         );
+        
+        // All Gloves
 
         public static Gloves ThiefGloves = new Gloves(
             "Thief's Gloves",
@@ -99,6 +118,8 @@ namespace Game.Items
             new Stats() { Strength = 4 }
         );
 
+        // All Necklaces
+
         public static Necklace AmuletOfWisdom = new Necklace(
             "Amulet of Wisdom",
             "A magical amulet that increases Intelligence.",
@@ -112,6 +133,8 @@ namespace Game.Items
             "Uncommon",
             new Stats() { Strength = 2, Agility = 2, Intelligence = 2 }
         );
+
+        // All Rings
 
         public static Ring SilverRing = new Ring(
             "Silver Ring",
@@ -128,8 +151,10 @@ namespace Game.Items
         );
 
 
-        // Weapons
-        // ---------------------
+    // Weapons
+    // ---------------------
+
+        // All Swords
 
         public static Sword ShortSword = new Sword
         ("Short Sword",
@@ -178,6 +203,8 @@ namespace Game.Items
             critMult: 2.3F,
             new Stats() { Strength = 35, Agility = 10, Intelligence = -5 }));
 
+        // All Heavy Weapons
+
         public static HeavyWeapon BattleAxe = new HeavyWeapon
         ("Battle Axe",
         "A heavy axe designed for powerful strikes.",
@@ -187,6 +214,8 @@ namespace Game.Items
             critChance: 20,
             critMult: 2.0F,
             new Stats() { Strength = 30, Agility = -10, Intelligence = -5 }));
+
+        // All Bows
 
         public static Bow WoodenBow = new Bow
         ("Wooden Bow",
@@ -218,11 +247,22 @@ namespace Game.Items
         public static Bow Longbow = new Bow
         ("Longbow",
         "A bow with great range and accuracy.",
-        rarity: "Rare",
+        rarity: "Uncommon",
         new WeaponStats(
             damage: 25,
             critChance: 15,
             critMult: 1.5F,
+            null));
+            
+        // All Magic Wands
+        public static MagicWand MagicWand = new MagicWand
+        ("Magic Wand",
+        "A simple magic wand.",
+        rarity: "Common",
+        new WeaponStats(
+            damage: 25,
+            critChance: 0,
+            critMult: 0,
             null));
 
     }

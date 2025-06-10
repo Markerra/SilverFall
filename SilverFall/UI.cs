@@ -149,7 +149,12 @@ namespace Game.UI
                     Show();
                     break;
                 case "D":
+                    if (!GameOptions.isDev) { Options(); }
                     GameSave.DeleteSave();
+                    break;
+                case "E":
+                    if (!GameOptions.isDev) { Options(); }
+                    TestFeature.Run();
                     break;
                 default:
                     Console.WriteLine("\n\n Invalid option. Please try again.");
