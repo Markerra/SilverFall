@@ -14,13 +14,13 @@ namespace Game
             List<Item> lootTable = enemyType switch
             {
                 "Zombie" => new List<Item>
-                { Database.LeatherArmor, Database.RingOfFortitude, Database.BronzeTrinket,
+                { Database.LeatherArmor, Database.BronzeTrinket,
                 Database.HealthPotion},
                 "Goblin" => new List<Item>
                 { Database.HealthPotion, Database.LeatherArmor, Database.BronzeTrinket,
                 Database.GoldenTrinket, Database.RubyPendant },
                 "Orc" => new List<Item>
-                { Database.SilverRing, Database.HealthPotion, Database.GoldenTrinket,
+                { Database.BronzeTrinket, Database.HealthPotion, Database.GoldenTrinket,
                 Database.IronHelmet, Database.AmuletOfWisdom },
                 "Dragon" => new List<Item>
                 { Database.ShadowLeggings, Database.HealthPotion, Database.GoldenTrinket,

@@ -38,7 +38,6 @@ namespace Game
         {
             Database.HealthPotion,
             Database.GoldenTrinket,
-            Database.SilverRing,
             Database.IronHelmet,
             Database.DragonHelm,
             Database.LeatherArmor,
@@ -51,7 +50,7 @@ namespace Game
             Database.GauntletsOfMight,
             Database.AmuletOfWisdom,
             Database.RubyPendant,
-            Database.RingOfFortitude,
+            Database.WoodenShield,
         };
 
         public static Item GetRandomItem(bool RarityCheck = true)
@@ -129,7 +128,7 @@ namespace Game
                     Item item = items[GameRandom.Instance.Next(0, items.Count)];
                     if (GameRandom.Instance.Next(0, 100) < Item.RarityChances[item.Rarity])
                     {
-                        GameLog.Write($"Picked random item from {GameLog.ItemListToString(items)} with rarity check. Got {item}");
+                        GameLog.Write($"Picked random item from {GameLog.ItemListToString(items)} with rarity check. Got {item.Name}");
                         return item;
                     }
                 }

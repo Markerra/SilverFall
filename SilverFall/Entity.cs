@@ -66,15 +66,33 @@ namespace Game
         {
             switch (equipment)
             {
-                case Helmet helmet: Equipment.Head = helmet; break;
-                case Chestplate chest: Equipment.Chest = chest; break;
-                case Leggings legs: Equipment.Legs = legs; break;
-                case Boots boots: Equipment.Feet = boots; break;
-                case Gloves gloves: Equipment.Hands = gloves; break;
-                case Necklace necklace: Equipment.Necklace = necklace; break;
-                case Ring ring: Equipment.Ring = ring; break;
-                case Weapon weapon: Equipment.Weapon = weapon; break;
-                case SpellBook spellBook: Equipment.SpellBook = spellBook; break;
+                case Helmet helmet:
+                    if (Equipment.Head != null) { AddItem(Equipment.Head); }
+                    Equipment.Head = helmet; break;
+                case Chestplate chest:
+                    if (Equipment.Chest != null) { AddItem(Equipment.Chest); }
+                    Equipment.Chest = chest; break;
+                case Leggings legs:
+                    if (Equipment.Legs != null) { AddItem(Equipment.Legs); }
+                    Equipment.Legs = legs; break;
+                case Boots boots:
+                    if (Equipment.Feet != null) { AddItem(Equipment.Feet); }
+                    Equipment.Feet = boots; break;
+                case Gloves gloves:
+                    if (Equipment.Hands != null) { AddItem(Equipment.Hands); }
+                    Equipment.Hands = gloves; break;
+                case Necklace necklace:
+                    if (Equipment.Necklace != null) { AddItem(Equipment.Necklace); }
+                    Equipment.Necklace = necklace; break;
+                case Shield shield:
+                    if (Equipment.Offhand != null) { AddItem(Equipment.Offhand); }
+                    Equipment.Offhand = shield; break;
+                case Weapon weapon:
+                    if (Equipment.Weapon != null) { AddItem(Equipment.Weapon); }
+                    Equipment.Weapon = weapon; break;
+                case SpellBook spellBook:
+                    if (Equipment.SpellBook != null) { AddItem(Equipment.SpellBook); }
+                    Equipment.SpellBook = spellBook; break;
                 default: throw new ArgumentException("Unknown equipment type");
             }
         }
@@ -83,6 +101,17 @@ namespace Game
         {
             Equipment? eq = (Equipment?)Inventory.Find(item => item.Name == name);
             if (eq != null) { Equip(eq); }
+        }
+
+        public bool EquipFirst<T>() where T : Equipment
+        {
+            var item = Inventory.OfType<T>().FirstOrDefault();
+            if (item != null)
+            {
+                Equip(item);
+                return true;
+            }
+            return false;
         }
 
         public void Attack(Entity target, Weapon weapon)
@@ -210,7 +239,7 @@ namespace Game
             if (Equipment.Feet != null) _bonusStats.AddStats(Equipment.Feet.BonusStats);
             if (Equipment.Hands != null) _bonusStats.AddStats(Equipment.Hands.BonusStats);
             if (Equipment.Necklace != null) _bonusStats.AddStats(Equipment.Necklace.BonusStats);
-            if (Equipment.Ring != null) _bonusStats.AddStats(Equipment.Ring.BonusStats);
+            if (Equipment.Offhand != null) _bonusStats.AddStats(Equipment.Offhand.BonusStats);
             if (Equipment.Weapon != null) _bonusStats.AddStats(Equipment.Weapon.BonusStats);
             if (Equipment.SpellBook != null) _bonusStats.AddStats(Equipment.SpellBook.BonusStats);
         }
@@ -235,7 +264,7 @@ namespace Game
         public Boots? Feet { get; set; }
         public Gloves? Hands { get; set; }
         public Necklace? Necklace { get; set; }
-        public Ring? Ring { get; set; }
+        public Shield? Offhand { get; set; }
         public Weapon? Weapon { get; set; }
         public SpellBook? SpellBook { get; set; }
 
@@ -248,7 +277,7 @@ namespace Game
             if (Feet != null) list.Add(Feet);
             if (Hands != null) list.Add(Hands);
             if (Necklace != null) list.Add(Necklace);
-            if (Ring != null) list.Add(Ring);
+            if (Offhand != null) list.Add(Offhand);
             if (Weapon != null) list.Add(Weapon);
             if (SpellBook != null) list.Add(SpellBook);
             return list;

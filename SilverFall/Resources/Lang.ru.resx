@@ -68,7 +68,7 @@
   </data>
 
   <data name="BattleSecRemains" xml:space="preserve">
-    <value>Осталось {0}с</value>
+    <value>[Осталось {0}с]</value>
   </data>
 
   <data name="spellCastingStatus" xml:space="preserve">

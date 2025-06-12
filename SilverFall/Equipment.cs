@@ -14,7 +14,7 @@ namespace Game
                 "Feet" => "Feet",
                 "Hands" => "Hands",
                 "Necklace" => "Necklace",
-                "Ring" => "Ring",
+                "Offhand" => "Offhand",
                 "Weapon" => "Weapon",
                 "SpellBook" => "SpellBook",
                 _ => throw new ArgumentException("Invalid equipment slot.")
@@ -62,9 +62,9 @@ namespace Game
 
     }
 
-    class Ring : Equipment
+    class Shield : Equipment
     {
-        public Ring(string name, string description, string rarity, Stats bonusStats) : base(name, description, rarity, "Ring", bonusStats) { }
+        public Shield(string name, string description, string rarity, Stats bonusStats) : base(name, description, rarity, "Offhand", bonusStats) { }
 
     }
 

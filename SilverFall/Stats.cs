@@ -30,7 +30,22 @@ namespace Game
         public float TotalCritChance => CritChance + (Agility * 0.01f);
         public float TotalManaCostDecrease => ManaCostDecrease + (Intelligence * 0.1f);
 
-        public Stats() { }
+        public Stats()
+        {
+            // Base player stats
+            Strength = 50;
+            Agility = 50;
+            Intelligence = 50;
+            BaseHealth = 200;
+            Health = MaxHealth;
+            HealthRegen = 10;
+            BaseMana = 145;
+            Mana = MaxMana;
+            ManaRegen = 5;
+            CritChance = 10;
+            MissChance = 5;
+            Defense = 0;
+        }
 
         public Stats(int str, int agi, int intell, float baseHp, float hpRegen, float baseMana, float manaRegen, float crit, float evasion, float def = 0)
         {
@@ -126,4 +141,5 @@ namespace Game
             ManaCost = manaCost;
         }
     }
+
 }

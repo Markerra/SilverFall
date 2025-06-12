@@ -209,7 +209,7 @@ namespace Game
 
             if (!Directory.Exists("logs")) { Directory.CreateDirectory("logs"); }
 
-            // Changing log number to not overwrite existing log
+            // changing log number to not overwrite existing log
 
             while (File.Exists(Path) && firstEdit)
             {
@@ -219,9 +219,9 @@ namespace Game
 
             firstEdit = false;
 
-            // Create a new file if log doesn't exist.
+            // create a new file if log doesn't exist.
             if (!File.Exists(Path)) { File.WriteAllText(Path, $"<{DateTime.Now}> {text}"); }
-            // Add a new line to an existing log file.
+            // add a new line to an existing log file.
             else { File.AppendAllText(Path, $"\n<{DateTime.Now}> {text}"); }
         }
 

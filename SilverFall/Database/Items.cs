@@ -134,22 +134,14 @@ namespace Game.Items
             new Stats() { Strength = 2, Agility = 2, Intelligence = 2 }
         );
 
-        // All Rings
+        // All Shields
 
-        public static Ring SilverRing = new Ring(
-            "Silver Ring",
-            "A simple silver ring. Gives 7 Agility",
+        public static Shield WoodenShield = new Shield(
+            "Wooden Shield",
+            "A simple wooden shield",
             "Common",
-            new Stats() { Agility = 7 }
+            new Stats() { Defense = 2 } // At the bottom add shield blocking logic for knight class
         );
-
-        public static Ring RingOfFortitude = new Ring(
-            "Ring of Fortitude",
-            "A ring that increases Strength and Defense.",
-            "Uncommon",
-            new Stats() { Strength = 3, Defense = 5 }
-        );
-
 
         // Weapons
         // ---------------------
@@ -255,6 +247,7 @@ namespace Game.Items
             null));
 
         // All Magic Wands
+
         public static MagicWand MagicWand = new MagicWand
         ("Magic Wand",
         "A simple magic wand.",

@@ -12,6 +12,7 @@ namespace Game
         {
             Type = type;
             Inventory = new List<Item> {weapon};
+            Equip(weapon);
             Loot = loot;
             OnDeath += (attacker) =>
             {
