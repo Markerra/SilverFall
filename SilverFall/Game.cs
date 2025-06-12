@@ -4,11 +4,15 @@ namespace Game
     using System.IO;
     using System.Collections.Generic;
     using System.Text.Json;
-    using System.Runtime.Intrinsics.X86;
+    using System.Globalization;
+    using System.Resources;
 
     static class GameManager
     {
         public static Player Player = new Player(new Stats(), "Player");
+        public static GameSave Save = new GameSave();
+        public static Battle? Battle;
+        public static int Stage = -1;
     }
 
     static class GameRandom
@@ -31,205 +35,36 @@ namespace Game
         }
     }
 
-    class Entity
-    {
-        public string Name { get; set; }
-        public int Experience { get; set; } = 0;
-        public int[] ExpTable { get; set; } = [0, 800, 2400, 5000, 8000, 13000, 19500, 27000, 34000, 43000];
-        public int Level { get; set; } // Level increases all stats by 11% per level
-        public Stats Stats { get; set; }
-        public Dictionary<string, Equipment?> Equipment { get; set; }
-        public List<Spell> SpellBook { get; set; }
-        public List<Item> Inventory { get; set; }
-        public event Action<Entity>? OnDeath;
-        public event Action? OnLevelUp;
-        public Entity(Stats stats, string name, int level)
-        {
-            Stats = stats;
-            Name = name;
-            Level = level;
-            Equipment = new Dictionary<string, Equipment?>
-            {
-                { "Head", null }, // 0
-                { "Chest", null }, // 1
-                { "Legs", null }, // 2
-                { "Feet", null }, // 3
-                { "Hands", null }, // 4
-                { "Necklace", null }, // 5
-                { "Ring", null }, // 6
-                { "Weapon", null }, // 7
-                { "Other", null } // 8
-            };
-            Inventory = new List<Item>();
-            SpellBook = new List<Spell>();
-        }
-
-        public void TakeDamage(float damage, Entity attacker)
-        {
-            Stats.Health -= Math.Max(0, damage);
-            if (Stats.Health == 0)
-            {
-                OnDeath?.Invoke(attacker);
-            }
-        }
-
-        public void Equip(Equipment equipment)
-        {
-            string slot = equipment.slot;
-            Equipment? prevEq = Equipment[slot];
-            if (prevEq != null) { Inventory.Add(prevEq); }
-            Equipment[slot] = equipment;
-            GameLog.Write($"{Name} equiped {equipment} in [{slot}] slot");
-        }
-
-        public void Equip(string name)
-        {
-            Equipment? eq = (Equipment?)Inventory.Find(item => item.Name == name);
-            if (eq != null) { Equip(eq); }
-        }
-
-        public void Attack(Entity target, Weapon weapon)
-        {
-            if (target == null)
-            {
-                Console.WriteLine("Target is null. Cannot attack.");
-                return;
-            }
-
-            weapon.OnAttack(this, target);
-
-            if (GameRandom.Instance.Next(0, 100) < target.Stats.MissChance)
-            {
-                Console.WriteLine($"{Name} missed the attack on {target.Name}!");
-                return;
-            }
-
-            float damageDealt = weapon.Stats.Damage * (1 - target.Stats.Defense / 100);
-            if (GameRandom.Instance.Next(0, 100) < weapon.Stats.CritChance)
-            {
-                damageDealt *= weapon.Stats.CritMultiplier;
-                Console.WriteLine($"{Name} landed a critical hit with {damageDealt} damage!");
-            }
-            else
-            {
-                Console.WriteLine($"{Name} attacked {target.Name} for {damageDealt} damage.");
-            }
-
-            target.TakeDamage(damageDealt, this);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
-        }
-
-        public void Heal(float amount)
-        {
-            Stats.Health += amount;
-        }
-
-        public void GiveExp(int amount)
-        {
-            Experience += amount;
-            Console.WriteLine($"{Name} gained {amount} experience points. Total: {Experience}");
-
-            int newLevel = Level;
-            while (newLevel < ExpTable.Length && Experience >= ExpTable[newLevel])
-            {
-                newLevel++;
-            }
-
-            if (newLevel > Level)
-            {
-                for (int i = Level; i < newLevel; i++)
-                {
-                    LevelUp();
-                }
-            }
-        }
-
-        public void LevelUp()
-        {
-            if (Level >= ExpTable.Length - 1)
-            {
-                Console.WriteLine($"{Name} has reached the maximum level.");
-                return;
-            }
-
-            float lvlMult = 1.11F; // Level multiplier for stats increase
-
-            Level++;
-            Stats.Strength = (int)(Stats.Strength * lvlMult);
-            Stats.Agility = (int)(Stats.Agility * lvlMult);
-            Stats.Intelligence = (int)(Stats.Intelligence * lvlMult);
-            Stats.Health = (int)(Stats.Health * lvlMult);
-            Stats.Mana = (int)(Stats.Mana * lvlMult);
-            Stats.Defense = (int)(Stats.Defense * lvlMult);
-
-            Console.WriteLine($"{Name} leveled up to level {Level}!");
-            OnLevelUp?.Invoke();
-        }
-
-        public Item AddItem(Item item)
-        {
-            Item newItem = item;
-            Inventory.Add(newItem);
-            newItem.Owner = this;
-            return newItem;
-        }
-
-        public void RemoveItem(Item item)
-        {
-            Inventory.Remove(item);
-        }
-
-        public void ShowInventory()
-        {
-            if (Inventory.Count == 0)
-            {
-                Console.WriteLine($"{Name}'s inventory is empty.");
-                return;
-            }
-
-            Console.WriteLine($"{Name}'s inventory contains:");
-            foreach (var item in Inventory)
-            {
-                if (item is Weapon weapon)
-                {
-                    weapon.GetWeaponInfo();
-                }
-                else
-                {
-                    Console.WriteLine($"{item.Name} \n{item.Description}");
-                }
-            }
-        }
-
-    }
-
     class GameSave
     {
         public string Name { get; set; }
         public int Seed { get; set; }
-        public Entity Player { get; set; }
+        public Player Player { get; set; }
         public int Stage { get; set; } // Current stage of the game
 
         public bool isDev { get; set; }
+        public string language { get; set; }
         public string? Hash { get; set; } // Integrity hash
 
         private static string fileName = "game_save";
 
         public GameSave()
         {
-            Name = "Player";
+            Name = "EmptySave";
             Seed = 0;
             Player = new Player(new Stats(), Name);
-            Stage = GameStage.CurrentStage;
+            Stage = GameManager.Stage;
             isDev = GameOptions.isDev;
+            language = GameOptions.lang;
         }
-        public GameSave(string name, int seed, Entity player, int stage, bool devMode)
+        public GameSave(string name, int seed, Player player, int stage, bool devMode)
         {
             Name = name;
             Seed = seed;
             Player = player;
             Stage = stage;
             isDev = devMode;
+            language = GameOptions.lang;
         }
 
         // Check if save file isn't corrupted and valid by hash
@@ -250,6 +85,7 @@ namespace Game
             using (JsonDocument doc = JsonDocument.Parse(json))
             {
                 var root = doc.RootElement;
+                GameLog.Write($"Extracting hash from '{fileName}.json'");
                 string? hash = root.TryGetProperty("Hash", out var hashProp) ? hashProp.GetString() : null;
                 // Remove hash for verification
                 var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
@@ -262,6 +98,7 @@ namespace Game
                     byte[] bytes = System.Text.Encoding.UTF8.GetBytes(jsonWithoutHash);
                     byte[] hashBytes = sha256.ComputeHash(bytes);
                     computedHash = Convert.ToBase64String(hashBytes);
+                    GameLog.Write($"Computed hash for '{fileName}.json'");
                 }
                 if (hash == null || hash != computedHash) { return false; }
                 else { return true; }
@@ -270,6 +107,11 @@ namespace Game
 
         public void SaveGame()
         {
+            Seed = GameRandom.Seed;
+            Player = GameManager.Player;
+            Stage = GameManager.Stage;
+            isDev = GameOptions.isDev;
+            language = GameOptions.lang;
             var options = new JsonSerializerOptions { WriteIndented = true };
             string? originalHash = Hash;
             Hash = string.Empty;
@@ -279,38 +121,49 @@ namespace Game
             Hash = originalHash; // Restore
             if (!Directory.Exists("saves")) { Directory.CreateDirectory("saves"); }
             File.WriteAllText($"saves\\{fileName}.json", jsonWithHash);
+            GameLog.Write($"Saved game progress to '{fileName}.json' file");
         }
 
         public static GameSave LoadGame()
         {
+            GameLog.Write("Loading game process started");
             string filePath = $"saves\\{fileName}.json";
             if (!File.Exists(filePath))
             {
                 new GameSave().SaveGame();
+                GameLog.Write("Loading game process failed. Save file not found");
                 throw new FileNotFoundException("Save file not found. Restart the game.\n", filePath);
             }
             string json = File.ReadAllText(filePath);
             GameSave? save = JsonSerializer.Deserialize<GameSave>(json);
             if (save == null) { throw new FileLoadException("Save file has not loaded succesfully"); }
             GameOptions.isDev = save.isDev;
+            GameOptions.lang = save.language;
             Console.WriteLine($"Dev Mode: {GameOptions.isDev}");
+            Console.WriteLine($"Language: {GameOptions.lang}");
             if (IsValidSave(json) || GameOptions.isDev)
             {
+                GameLog.Write("Loading game process finished.");
                 Console.WriteLine("Passed integrity check");
                 return save;
             }
             else
             {
+                GameLog.Write("Loading game process failed. Save file integrity check failed");
                 DeleteSave(backup: true);
                 new GameSave().SaveGame();
+                Thread.Sleep(10);
                 throw new InvalidDataException("Game save file integrity check failed. The file may have been tampered with. Restart you game.");
             }
         }
 
-        public static void StartNewGame(GameSave saveFile)
+        public void StartNewGame()
         {
-            GameRandom.SetSeed(saveFile.Seed);
-            Console.WriteLine("Starting new game..");
+            GameRandom.SetSeed(Seed);
+            GameManager.Player = Player;
+            GameManager.Save = this;
+            GameManager.Stage = Stage;
+            UI.Tutorial.Show();
         }
 
         public static void DeleteSave(bool backup = false)
@@ -322,23 +175,22 @@ namespace Game
             }
             else
             {
-                if (backup) { File.Copy(filePath, $"saves\\{fileName}_backup.json", true); }
+                if (backup)
+                {
+                    GameLog.Write($"Creating backup of file '{fileName}.json'");
+                    File.Copy(filePath, $"saves\\{fileName}_backup.json", true);
+                }
                 File.Delete(filePath);
+                GameLog.Write("Deleted current save file");
             }
         }
-    }
-
-    static class GameStage
-    {
-        public static int CurrentStage = -1;
     }
 
     static class GameOptions
     {
         public static bool setSeed;
         public static bool isDev;
-
-
+        public static string lang = "en";
     }
 
     static class GameInfo
@@ -358,7 +210,7 @@ namespace Game
             if (!Directory.Exists("logs")) { Directory.CreateDirectory("logs"); }
 
             // Changing log number to not overwrite existing log
-            
+
             while (File.Exists(Path) && firstEdit)
             {
                 logNumber++;
@@ -368,15 +220,30 @@ namespace Game
             firstEdit = false;
 
             // Create a new file if log doesn't exist.
-            if (!File.Exists(Path) ) { File.WriteAllText(Path, $"<{DateTime.Now}> {text}"); }
+            if (!File.Exists(Path)) { File.WriteAllText(Path, $"<{DateTime.Now}> {text}"); }
             // Add a new line to an existing log file.
             else { File.AppendAllText(Path, $"\n<{DateTime.Now}> {text}"); }
         }
-        
+
         public static string ItemListToString(List<Item> loot)
         {
             if (loot == null || loot.Count == 0) return "(none)";
             return string.Join(", ", loot.Select(item => item?.Name ?? "Unknown Item"));
+        }
+    }
+
+    public static class Localization
+    {
+        private static ResourceManager _rm = new ResourceManager("SilverFall.Resources.Lang", typeof(Localization).Assembly);
+
+        public static string Get(string key, params object[] args)
+        {
+            string value = _rm.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+            return args.Length > 0 ? string.Format(value, args) : value;
+        }
+        public static void UpdateLanguage()
+        {
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(GameOptions.lang);
         }
     }
 

@@ -3,28 +3,38 @@ namespace Game.UI
     using System;
     using System.Timers;
 
+    static class Generic
+    {
+        public static void PressAnyKey()
+        {
+            Console.WriteLine(Localization.Get("UI_PressAnyKey"));
+            Console.ReadKey(true);
+        }
+    }
+
     static class MainMenu
     {
 
         public static void Show()
         {
-            GameSave save = GameSave.LoadGame();
-            if (save.Stage >= 0) // If player started new game - show Continue button
+            GameManager.Save = GameSave.LoadGame();
+            Localization.UpdateLanguage();
+            if (GameManager.Save.Stage >= 0) // If player started new game - show Continue button
             {
                 Console.Clear();
                 Console.WriteLine($"======={GameInfo.Name}=======\n");
-                Console.WriteLine("1. Continue");
-                Console.WriteLine("2. New Game");
-                Console.WriteLine("3. Options");
-                Console.WriteLine("4. Exit");
-                Console.Write(" >> Please select an option: ");
+                Console.WriteLine($"1. {Localization.Get("MainMenuContinue")}");
+                Console.WriteLine($"2. {Localization.Get("MainMenuNewGame")}");
+                Console.WriteLine($"3. {Localization.Get("MainMenuOptions")}");
+                Console.WriteLine($"4. {Localization.Get("MainMenuExit")}");
+                Console.Write(Localization.Get("UI_SelectOption"));
                 string input = Console.ReadKey().KeyChar.ToString();
                 switch (input)
                 {
                     case "1":
                         // Show loading dots
                         Console.Clear();
-                        Console.Write("Loading game");
+                        Console.Write(Localization.Get("Loading"));
                         Timer loading = LoadingDots(60);
                         loading.Start();
                         Thread.Sleep(300); // Simulate loading
@@ -42,7 +52,7 @@ namespace Game.UI
                         if (confirm.Equals("Y", StringComparison.OrdinalIgnoreCase))
                         {
                             Console.Clear();
-                            Console.Write("Starting a new game");
+                            Console.Write(Localization.Get("UI_LoadingNewGame"));
                             Timer loading2 = LoadingDots(100);
                             loading2.Start();
                             Thread.Sleep(600); // Simulate loading
@@ -62,9 +72,8 @@ namespace Game.UI
                         Environment.Exit(0);
                         break;
                     default:
-                        Console.WriteLine("\n Invalid option. Please try again.");
-                        Console.WriteLine(" >> Press any key to continue...");
-                        Console.ReadKey();
+                        Console.WriteLine("\n" + Localization.Get("UI_InvalidOption"));
+                        Generic.PressAnyKey();
                         Show();
                         break;
                 }
@@ -73,39 +82,30 @@ namespace Game.UI
             {
                 Console.Clear();
                 Console.WriteLine($"======={GameInfo.Name}=======\n");
-                Console.WriteLine("1. New Game");
-                Console.WriteLine("2. Load Game");
-                Console.WriteLine("3. Options");
-                Console.WriteLine("4. Exit");
-                Console.Write(" >> Please select an option: ");
+                Console.WriteLine($"1. {Localization.Get("MainMenuNewGame")}");
+                Console.WriteLine($"2. {Localization.Get("MainMenuOptions")}");
+                Console.WriteLine($"3. {Localization.Get("MainMenuExit")}");
+                Console.Write(Localization.Get("UI_SelectOption"));
                 string input = Console.ReadKey().KeyChar.ToString();
                 switch (input)
                 {
                     case "1":
                         // Show loading dots
                         Console.Clear();
-                        Console.Write("Starting a new game");
+                        Console.Write(Localization.Get("UI_LoadingNewGame"));
                         Timer loading = LoadingDots(100);
                         loading.Start();
                         Thread.Sleep(600); // Simulate loading
                         loading.Stop();
                         CreateSaveFile();
                         break;
-                    case "2":
-                        Console.WriteLine("\nLoading game...");
-                        GameSave.LoadGame();
-                        break;
+                    case "2": Options(); break;
                     case "3":
-                        Options();
-                        break;
-                    case "4":
                         Console.WriteLine("\nExiting the game. Cya!");
-                        Environment.Exit(0);
-                        break;
+                        Environment.Exit(0); break;
                     default:
-                        Console.WriteLine("\n Invalid option. Please try again.");
-                        Console.WriteLine(" >> Press any key to continue...");
-                        Console.ReadKey();
+                        Console.WriteLine("\n " + Localization.Get("UI_InvalidOption"));
+                        Generic.PressAnyKey();
                         Show();
                         break;
                 }
@@ -115,20 +115,21 @@ namespace Game.UI
         public static void Options()
         {
             Console.Clear();
-            Console.WriteLine("Options:");
-            Console.WriteLine($"1. Set Seed Mode ({GameOptions.setSeed})");
-            Console.WriteLine($"2. Dev Mode ({GameOptions.isDev})");
+            Console.WriteLine($"{Localization.Get("MainMenuOptions")}:");
+            Console.WriteLine($"1. {Localization.Get("OptionsSetSeed")} ({GameOptions.setSeed})");
+            Console.WriteLine($"2. {Localization.Get("OptionsDevMode")} ({GameOptions.isDev})");
+            Console.WriteLine($"3. {Localization.Get("OptionsLang")} ({GameOptions.lang})");
             if (GameOptions.isDev)
             {
                 Console.WriteLine($"-----------Dev-----------");
                 Console.WriteLine($"D. Delete your save file");
                 Console.WriteLine($"E. Test Feature");
                 Console.WriteLine($"-----------Dev-----------");
-                
+
             }
-            Console.WriteLine("3. Return");
-            Console.Write(" >> Please select an option: ");
-            string input = Console.ReadKey().KeyChar.ToString();
+            Console.WriteLine($"4. {Localization.Get("UI_Return")}");
+            Console.Write(Localization.Get("UI_SelectOption"));
+            string input = Console.ReadKey(true).KeyChar.ToString();
             switch (input)
             {
                 case "1":
@@ -137,15 +138,38 @@ namespace Game.UI
                     break;
                 case "2":
                     GameOptions.isDev = !GameOptions.isDev;
-                    Console.Clear(); Console.Write("Please wait");
+                    Console.Clear(); Console.Write(Localization.Get("UI_Wait"));
                     Timer loading = LoadingDots(40);
                     loading.Start();
-                    new GameSave().SaveGame();
+                    GameManager.Save.SaveGame();
                     Thread.Sleep(120); // Simulate loading
                     loading.Stop();
                     Options();
                     break;
                 case "3":
+                    Console.Clear();
+                    Console.WriteLine("1. English");
+                    Console.WriteLine("2. Русский");
+                    string langIndex = Console.ReadKey(true).KeyChar.ToString();
+                    switch (langIndex)
+                    {
+                        case "1":
+                            GameOptions.lang = "en";
+                            break;
+                        case "2":
+                            GameOptions.lang = "ru";
+                            break;
+                        default:
+                            Console.WriteLine("\n\n " + Localization.Get("UI_InvalidOption"));
+                            Generic.PressAnyKey();
+                            Options();
+                            break;
+                    }
+                    GameManager.Save.SaveGame();
+                    Localization.UpdateLanguage();
+                    Show();
+                    break;
+                case "4":
                     Show();
                     break;
                 case "D":
@@ -157,9 +181,8 @@ namespace Game.UI
                     TestFeature.Run();
                     break;
                 default:
-                    Console.WriteLine("\n\n Invalid option. Please try again.");
-                    Console.WriteLine(" >> Press any key to continue...");
-                    Console.ReadKey();
+                    Console.WriteLine("\n\n " + Localization.Get("UI_InvalidOption"));
+                    Generic.PressAnyKey();
                     Options();
                     break;
             }
@@ -168,29 +191,29 @@ namespace Game.UI
         public static void CreateSaveFile()
         {
             Console.Clear();
-            Console.WriteLine("Creating Save File (#1)");
-            Console.Write("\n >> Enter your Name: ");
+            Console.WriteLine($"(#1) {Localization.Get("CreatingSaveProgress")}");
+            Console.Write($"\n{Localization.Get("CreatingSaveEnterName")}");
             string name = Console.ReadLine() ?? "";
             while (string.IsNullOrWhiteSpace(name))
             {
-                Console.Write("Name cannot be empty. \n >> Please enter your Name: ");
+                Console.Write($"{Localization.Get("CreatingSaveEmptyNameError")} \n{Localization.Get("CreatingSaveEnterName")}");
                 name = Console.ReadLine() ?? "";
             }
 
             Console.Clear();
-            Console.WriteLine("(#2) Creating Save File");
+            Console.WriteLine($"(#2) {Localization.Get("CreatingSaveProgress")}");
             int seed = GameRandom.GenerateSeed();
             if (GameOptions.setSeed)
             {
-                Console.Write(" >> Enter your Seed (leave blank for random): ");
+                Console.Write(Localization.Get("CreatingSaveEnterSeed"));
                 string? input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     while (!int.TryParse(input, out seed))
                     {
                         Console.Clear();
-                        Console.WriteLine("(#2) Creating Save File");
-                        Console.Write("Invalid number entered. \n >> Enter your Seed (leave blank for random): ");
+                        Console.WriteLine($"(#2) {Localization.Get("CreatingSaveProgress")}");
+                        Console.Write($"{Localization.Get("UI_InvalidNumberEntered")}\n{Localization.Get("CreatingSaveEnterSeed")}");
                         input = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(input))
                         {
@@ -204,7 +227,7 @@ namespace Game.UI
             // Seed animation
             int seedsGen = 0;
             int maxSeeds = 50;
-            Console.Write("Generating Seed: \n");
+            Console.Write($"{Localization.Get("CreatingSaveGeneratingSeed")} ");
             int left = Console.CursorLeft;
             int top = Console.CursorTop;
             while (seedsGen < maxSeeds)
@@ -217,25 +240,27 @@ namespace Game.UI
             }
             Console.SetCursorPosition(0, top + 1);
             Console.Clear();
-            Console.WriteLine("(#2) Creating Save File");
-            Console.WriteLine($"Your seed: \n{seed}");
-            Console.WriteLine(" >> Press any key to continue...");
-            Console.ReadKey();
+            Console.WriteLine($"(#2) {Localization.Get("CreatingSaveProgress")}");
+            Console.WriteLine($"{Localization.Get("CreatingSaveYourSeed")} {seed}");
+            Generic.PressAnyKey();
             Console.Clear();
 
             // Show loading dots
-            Console.Write("(#3) Creating Save File");
+            Console.Write($"(#3) {Localization.Get("CreatingSaveProgress")}");
             Timer loading = LoadingDots(100);
             loading.Start();
 
-            GameStage.CurrentStage = 0;
+            GameManager.Stage = 0;
             Player player = new Player(new Stats(), name);
-            GameSave save = new GameSave(name, seed, player, GameStage.CurrentStage, GameOptions.isDev);
-            GameSave.StartNewGame(save);
-            save.SaveGame();
+            GameSave save = new GameSave(name, seed, player, GameManager.Stage, GameOptions.isDev);
 
             Thread.Sleep(800);
             loading.Stop();
+
+            save.StartNewGame();
+            save.SaveGame();
+
+
         }
 
         public static Timer LoadingDots(int interval = 500)
@@ -250,5 +275,36 @@ namespace Game.UI
             };
             return timer;
         }
+    }
+
+    static class Battle
+    {
+        public static void ShowBattleInfo(Game.Battle battle)
+        {
+            Console.WriteLine("- Battle -");
+            Console.WriteLine(Localization.Get("BattleInfo", battle.Attacker.Name, battle.Target.Name));
+            Console.WriteLine(Localization.Get("BattleAttackerInfo", battle.Attacker.Name,
+            Localization.Get("BattleEntityStats", battle.Attacker.Stats.Health, battle.Attacker.Stats.Mana)
+            + $" {Localization.Get("BattleEntityStatsHint", 'A')}" ));
+            Console.WriteLine(Localization.Get("BattleTargetInfo", battle.Target.Name,
+            Localization.Get("BattleEntityStats", battle.Attacker.Stats.Health, battle.Attacker.Stats.Mana)
+            + $" {Localization.Get("BattleEntityStatsHint", 'E')}" ));
+        }
+    }
+
+    static class Tutorial
+    {
+        public static void Show()
+        {
+            Console.Clear();
+            if (GameManager.Stage != 0) { return; }
+            Console.WriteLine("Press any button to start. \n >> ");
+            Console.ReadKey(false);
+            Console.Clear();
+            GameLog.Write("UI: Started tutorial");
+
+            // Code
+        }
+
     }
 }

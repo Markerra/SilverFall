@@ -2,11 +2,11 @@ namespace Game
 {
     class Equipment : Item
     {
-        public string slot { get; set; }
+        public string Slot { get; set; }
         public Stats BonusStats { get; set; }
         public Equipment(string name, string description, string rarity, string slot, Stats bonusStats) : base(name, description, rarity, null)
         {
-            this.slot = slot switch
+            this.Slot = slot switch
             {
                 "Head" => "Head",
                 "Chest" => "Chest",
@@ -16,33 +16,13 @@ namespace Game
                 "Necklace" => "Necklace",
                 "Ring" => "Ring",
                 "Weapon" => "Weapon",
-                "Other" => "Other",
+                "SpellBook" => "SpellBook",
                 _ => throw new ArgumentException("Invalid equipment slot.")
             };
             this.BonusStats = bonusStats;
         }
 
-        public void Equip()
-        {
-            if (this.Owner != null)
-            {
-                this.Owner.Equipment[this.slot] = this;
-                this.Owner.Stats.AddStats(this.BonusStats);
-            }
-        }
-
-        public void Equip(Equipment item) { item.Equip(); }
-
-        public void Unequip()
-        {
-            if (this.Owner != null)
-            {
-                this.Owner.Equipment[this.slot] = null;
-                this.Owner.Stats.RemoveStats(this.BonusStats);
-            }
-        }
-
-        public void Unequip(Equipment item) { item.Unequip(); }
+        public void Equip() { if (Owner != null) { Owner.Equip(this); } }
     }
 
     class Helmet : Equipment
@@ -86,5 +66,39 @@ namespace Game
     {
         public Ring(string name, string description, string rarity, Stats bonusStats) : base(name, description, rarity, "Ring", bonusStats) { }
 
+    }
+
+    class SpellBook : Equipment
+    {
+        public List<Spell> Spells { get; set; }
+        public Spell? SelectedSpell { get; set; }
+        public SpellBook(string name, string description, string rarity, Stats bonusStats) : base(name, description, rarity, "SpellBook", bonusStats)
+        {
+            Spells = new List<Spell>();
+        }
+
+        public void SelectSpell()
+        {
+            if (Spells.Count == 0) { Console.WriteLine($"{Name} has no spells in it"); return; }
+            for (int i = 0; i < Spells.Count; i++)
+            {
+                Spell spell = Spells[i];
+                string text = $"{i + 1}. {spell.Name} (Damage: {spell.Stats.Damage}, Cost: {spell.Stats.ManaCost})";
+                if (SelectedSpell != spell) { Console.WriteLine(text); } else { Console.WriteLine(text + " [selected]"); }
+            }
+            Console.WriteLine(" >> Select your spell: ");
+            int index;
+            GameLog.Write($"{GameManager.Player.Name} is selecting spell in {Name}");
+            while (true)
+            {
+                char c = Console.ReadKey(true).KeyChar;
+                if (char.IsDigit(c))
+                {
+                    int digit = c - 48; // IDK HOW IT WORKS BUT IT WORKS. DONT CHANGE THIS NUMBER
+                    if (digit > 0 && digit <= Spells.Count) {index = digit; GameLog.Write($"index: {index}"); break;}
+                }
+            }
+            SelectedSpell = Spells[index - 1];
+        }
     }
 }

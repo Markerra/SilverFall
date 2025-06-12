@@ -19,14 +19,8 @@ namespace Game
                 Loot.Generate();
 
                 // Adds enemy's equipment to the loot table
-                foreach (string slot in Equipment.Keys)
-                {
-                    Equipment? equipment = Equipment[slot];
-                    if (equipment != null)
-                    {
-                        Loot.Items.Add(equipment);
-                    }
-                }
+                List<Equipment>? eq = Equipment.GetAsList();
+                if (eq != null) { Loot.Items.AddRange(eq); }
 
                 // Adds items from the enemy's inventory to the loot table
                 foreach (Item item in Inventory)

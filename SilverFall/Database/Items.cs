@@ -3,12 +3,12 @@ namespace Game.Items
     static class Database
     {
 
-    // Items
-    // ---------------------
+        // Items
+        // ---------------------
 
 
         // All Potions 
-        
+
         public static Item HealthPotion = new Item
         ("Health Potion",
         "Restores 50 health points.",
@@ -85,7 +85,7 @@ namespace Game.Items
             "Rare",
             new Stats() { Agility = 7, Defense = 3 }
         );
-        
+
         // All Boots
 
         public static Boots SwiftBoots = new Boots(
@@ -101,7 +101,7 @@ namespace Game.Items
             "Rare",
             new Stats() { Defense = 8, Agility = -3 }
         );
-        
+
         // All Gloves
 
         public static Gloves ThiefGloves = new Gloves(
@@ -151,8 +151,8 @@ namespace Game.Items
         );
 
 
-    // Weapons
-    // ---------------------
+        // Weapons
+        // ---------------------
 
         // All Swords
 
@@ -253,17 +253,27 @@ namespace Game.Items
             critChance: 15,
             critMult: 1.5F,
             null));
-            
+
         // All Magic Wands
         public static MagicWand MagicWand = new MagicWand
         ("Magic Wand",
         "A simple magic wand.",
         rarity: "Common",
         new WeaponStats(
-            damage: 25,
-            critChance: 0,
-            critMult: 0,
-            null));
+            0, 0, 0, // Magic wand doesn't have damage, crit, etc.
+            new Stats()
+            {
+                SpellAmplify = 0,
+                ManaCostDecrease = 0
+            }));
+
+        // All Spell Books
+
+        public static SpellBook SpellBook = new SpellBook
+        ("Spell Book",
+        "Default book used for storing many spells and their combos.",
+        rarity: "Common",
+        new Stats());
 
     }
 }

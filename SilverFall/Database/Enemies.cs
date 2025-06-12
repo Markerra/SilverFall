@@ -6,15 +6,18 @@ namespace Game.Enemies
     static class Database
     {
         public static Enemy Zombie = new Enemy(
-            new Stats()
-            {
-                Health = 100,
-                Strength = 5,
-                Agility = 2,
-                Intelligence = 1,
-                Defense = 3,
-                MissChance = 3
-            },
+            new Stats(
+                str: 10,
+                agi: 5,
+                intell: 1,
+                baseHp: 200,
+                hpRegen: 3,
+                baseMana: 0,
+                manaRegen: 0,
+                crit: 20,
+                evasion: 10,
+                def: 0
+            ),
             "Zombie",
             1,
             Items.Database.Claymore,
@@ -23,15 +26,18 @@ namespace Game.Enemies
         );
         
         public static Enemy Goblin = new Enemy(
-            new Stats()
-            {
-                Health = 70,
-                Strength = 8,
-                Agility = 4,
-                Intelligence = 2,
-                Defense = 3,
-                MissChance = 4
-            },
+            new Stats(
+                str: 15,
+                agi: 12,
+                intell: 9,
+                baseHp: 230,
+                hpRegen: 4,
+                baseMana: 90,
+                manaRegen: 2.5f,
+                crit: 16,
+                evasion: 3,
+                def: 0
+            ),
             "Goblin",
             1,
             Items.Database.ShortSword,
@@ -40,15 +46,18 @@ namespace Game.Enemies
         );
 
         public static Enemy Orc = new Enemy(
-            new Stats()
-            {
-                Health = 120,
-                Strength = 17,
-                Agility = 7,
-                Intelligence = 0,
-                Defense = 15,
-                MissChance = 1
-            },
+            new Stats(
+                str: 35,
+                agi: 3,
+                intell: 0,
+                baseHp: 230,
+                hpRegen: 7,
+                baseMana: 140,
+                manaRegen: 3,
+                crit: 20,
+                evasion: 0,
+                def: 8
+            ),
             "Orc",
             1,
             Items.Database.BattleAxe,
@@ -57,15 +66,18 @@ namespace Game.Enemies
         );
 
         public static Enemy Dragon = new Enemy(
-            new Stats()
-            {
-                Health = 450,
-                Strength = 17,
-                Agility = 9,
-                Intelligence = 10,
-                Defense = 20,
-                MissChance = 25
-            },
+            new Stats(
+                str: 60,
+                agi: 15,
+                intell: 40,
+                baseHp: 400,
+                hpRegen: 6,
+                baseMana: 555,
+                manaRegen: 12.5f,
+                crit: 40,
+                evasion: 30,
+                def: 10
+            ),
             "Dragon",
             3,
             Items.Database.DragonClaw,
