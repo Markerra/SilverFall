@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="UI_SelectOption" xml:space="preserve">
+    <value> >> Выберите опцию: </value>
+  </data>
+  <data name="UI_InvalidOption" xml:space="preserve">
+    <value>Неверная опция. Повторите еще раз</value>
+  </data>
+  <data name="UI_InvalidNumberEntered" xml:space="preserve">
+    <value>Введено неправильное число.</value>
+  </data>
+  <data name="UI_PressAnyKey" xml:space="preserve">
+    <value>  >> Нажмите любую клавишу чтобы продолжить... </value>
+  </data>
+  <data name="UI_Loading" xml:space="preserve">
+    <value>Загрузка..</value>
+  </data>
+  <data name="UI_Wait" xml:space="preserve">
+    <value>Пожалуйста подождите</value>
+  </data>
+  <data name="UI_LoadingNewGame" xml:space="preserve">
+    <value>Запуск новой игры..</value>
+  </data>
+  <data name="UI_Return" xml:space="preserve">
+    <value>Return</value>
+  </data>
+
+  <data name="MainMenuContinue" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="MainMenuNewGame" xml:space="preserve">
+    <value>Новая игра</value>
+  </data>
+  <data name="MainMenuOptions" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="MainMenuExit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+
+  <data name="CreatingSaveProgress" xml:space="preserve">
+    <value>Создание сохранения</value>
+  </data>
+  <data name="CreatingSaveEnterName" xml:space="preserve">
+    <value> >> Введите Имя: </value>
+  </data>
+  <data name="CreatingSaveEmptyNameError" xml:space="preserve">
+    <value>Имя не может быть пустым.</value>
+  </data>
+  <data name="CreatingSaveEnterSeed" xml:space="preserve">
+    <value> >> Введите сид (оставьте пустым для случайной генерации): </value>
+  </data>
+  <data name="CreatingSaveGeneratingSeed" xml:space="preserve">
+    <value>Генерация сида:</value>
+  </data>
+  <data name="CreatingSaveYourSeed" xml:space="preserve">
+    <value>Ваш сид:</value>
+  </data>
+
+  <data name="OptionsSetSeed" xml:space="preserve">
+    <value>Режим установки сида</value>
+  </data>
+  <data name="OptionsDevMode" xml:space="preserve">
+    <value>Режим разработчика</value>
+  </data>
+  <data name="OptionsLang" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+
+  <data name="BattleSecRemains" xml:space="preserve">
+    <value>[Осталось {0}с]</value>
+  </data>
+
+  <data name="spellCastingStatus" xml:space="preserve">
+    <value>Вы кастуете "{0}" [{1}] на {2} ({3} LVL)</value>
+  </data>
+  <data name="spellCastingWrongChar" xml:space="preserve">
+    <value>Неправильная буква произнесена!</value>
+  </data>
+</root>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="UI_SelectOption" xml:space="preserve">
+    <value> >> Please select an option: </value>
+  </data>
+  <data name="UI_InvalidOption" xml:space="preserve">
+    <value>Invalid option. Please try again</value>
+  </data>
+  <data name="UI_InvalidNumberEntered" xml:space="preserve">
+    <value>Invalid number entered.</value>
+  </data>
+  <data name="UI_PressAnyKey" xml:space="preserve">
+    <value>  >> Press any key to continue... </value>
+  </data>
+  <data name="UI_Loading" xml:space="preserve">
+    <value>Loading..</value>
+  </data>
+  <data name="UI_Wait" xml:space="preserve">
+    <value>Please wait</value>
+  </data>
+  <data name="UI_LoadingNewGame" xml:space="preserve">
+    <value>Starting a New Game..</value>
+  </data>
+  <data name="UI_Return" xml:space="preserve">
+    <value>Return</value>
+  </data>
+
+  <data name="MainMenuContinue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="MainMenuNewGame" xml:space="preserve">
+    <value>New Game</value>
+  </data>
+  <data name="MainMenuOptions" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="MainMenuExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+
+  <data name="CreatingSaveProgress" xml:space="preserve">
+    <value>Creating Save File</value>
+  </data>
+  <data name="CreatingSaveEnterName" xml:space="preserve">
+    <value> >> Enter your Name: </value>
+  </data>
+  <data name="CreatingSaveEmptyNameError" xml:space="preserve">
+    <value>Name cannot be empty.</value>
+  </data>
+  <data name="CreatingSaveEnterSeed" xml:space="preserve">
+    <value> >> Enter your Seed (leave blank for random): </value>
+  </data>
+  <data name="CreatingSaveGeneratingSeed" xml:space="preserve">
+    <value>Generating seed:</value>
+  </data>
+  <data name="CreatingSaveYourSeed" xml:space="preserve">
+    <value>Your seed:</value>
+  </data>
+
+  <data name="OptionsSetSeed" xml:space="preserve">
+    <value>Set Seed Mode</value>
+  </data>
+  <data name="OptionsDevMode" xml:space="preserve">
+    <value>Dev Mode</value>
+  </data>
+  <data name="OptionsLang" xml:space="preserve">
+    <value>Language</value>
+  </data>
+
+  <data name="BattleInfoVersus" xml:space="preserve">
+    <value>Battle: {0} vs {1}</value>
+  </data>
+  <data name="BattleInfoTurn" xml:space="preserve">
+    <value>Turn: #{0} ({1}'s turn)</value>
+  </data>
+  <data name="BattleAttackerInfo" xml:space="preserve">
+    <value>Attacker: {0} - {1}</value>
+  </data>
+  <data name="BattleTargetInfo" xml:space="preserve">
+    <value>Enemy: {0} - {1}</value>
+  </data>
+  <data name="BattleEntityStats" xml:space="preserve">
+    <value>HP: {0}/{1}  MP: {2}/{3}</value>
+  </data>
+  <data name="BattleEntityStatsHint" xml:space="preserve">
+    <value>(Press '{0}' to display advanced stats)</value>
+  </data>
+  <data name="BattleActions" xml:space="preserve">
+    <value>Actions: </value>
+  </data>
+  <data name="BattleSecRemains" xml:space="preserve">
+    <value>Time left: {0}s</value>
+  </data>
+  <data name="BattleNoWeapon" xml:space="preserve">
+    <value>No weapon equipped!</value>
+  </data>
+  <data name="BattleNoShield" xml:space="preserve">
+    <value>No shield equipped!</value>
+  </data>
+  <data name="BattleNoSpellBook" xml:space="preserve">
+    <value>No spell book equipped!</value>
+  </data>
+  <data name="BattleNoSpell" xml:space="preserve">
+    <value>No spell selected!</value>
+  </data>
+
+  <data name="spellCastingStatus" xml:space="preserve">
+    <value>You're casting "{0}" [{1}] on {2} ({3} LVL)</value>
+  </data>
+  <data name="spellCastingWrongChar" xml:space="preserve">
+    <value>Wrong character spelled!</value>
+  </data>
+</root>
