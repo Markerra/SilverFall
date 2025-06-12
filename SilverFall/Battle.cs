@@ -61,7 +61,7 @@ namespace Game
                 Console.SetCursorPosition(0, countdownLine);
                 Console.Write(display);
 
-                Thread.Sleep(10);
+                Thread.Sleep(8);
             }
             Console.CursorVisible = true;
         }
