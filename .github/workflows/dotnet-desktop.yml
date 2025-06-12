@@ -22,7 +22,7 @@ jobs:
       run: dotnet publish -c Release -o build
     
     - name: Archive Build
-      run: zip -r myapp.zip build/
+      run: zip -r silverfall.zip build/
 
     - name: Release
       uses: softprops/action-gh-release@v1
