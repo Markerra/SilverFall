@@ -18,17 +18,19 @@
     ],
     "Level": 1,
     "Stats": {
-      "Strength": 50,
-      "Agility": 50,
-      "Intelligence": 50,
-      "Health": 0,
-      "MaxHealth": 350,
-      "HealthRegen": 28.8,
-      "Mana": 1250,
-      "ManaRegen": 44.2,
+      "Strength": 150,
+      "Agility": 150,
+      "Intelligence": 150,
+      "Health": 1640,
+      "MaxHealth": 1050,
+      "HealthRegen": 86.4,
+      "Mana": 3750,
+      "ManaRegen": 132.6,
       "Defense": 0,
-      "MissChance": 0.5,
-      "CritChance": 0.5
+      "MissChance": 1.5,
+      "CritChance": 1.5,
+      "SpellAmplify": 0,
+      "ManaCostDecrease": 15
     },
     "Equipment": {
       "Head": null,
@@ -39,12 +41,10 @@
       "Necklace": null,
       "Ring": null,
       "Weapon": null,
-      "Other": null
+      "SpellBook": null
     },
-    "SpellBook": [],
     "Inventory": []
   },
   "Stage": -1,
-  "isDev": true,
-  "Hash": "yQJ0Cy4btvNd2CaPc\u002B6t98VYaS2JP2i1KARAUf21Y9A="
+  "Hash": "qZmi9Y5N66wQ1PxUg9brfAnjqTDIUBBGNXZV9eYuyoc="
 }
