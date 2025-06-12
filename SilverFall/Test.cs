@@ -7,7 +7,6 @@ namespace Game
         {
             //// This code can be runned from options with dev mode
 
-
             GameLog.Write("Test");
             Console.Clear();
             GameManager.Player.AddItem(Items.Database.MagicWand);
