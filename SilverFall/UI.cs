@@ -141,6 +141,7 @@ namespace Game.UI
                     Console.Clear(); Console.Write(Localization.Get("UI_Wait"));
                     Timer loading = LoadingDots(40);
                     loading.Start();
+                    GameLog.Write("Dev mode enabled");
                     GameManager.Save.SaveGame();
                     Thread.Sleep(120); // Simulate loading
                     loading.Stop();
@@ -288,31 +289,31 @@ namespace Game.UI
 
             if (weapon == null && shield == null)
             {
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else if (weapon != null && shield == null)
             {
-                Console.WriteLine($"1. Attack using {weapon.Name}");
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"1. {Localization.Get("BattleActionAttack", weapon.Name)}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else if (weapon == null && shield != null)
             {
-                Console.WriteLine($"2. Try to block using {shield.Name} ({shield})"); // <<< добавить в конце шанс блока
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"2. {Localization.Get("BattleActionAttack", shield.Name, 999)}"); // <<< добавить в конце шанс блока
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else if (weapon != null && shield != null)
             {
-                Console.WriteLine($"1. Attack using {weapon.Name}");
-                Console.WriteLine($"2. Try to block using {shield.Name} ({shield})"); // <<< добавить в конце шанс блока
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"1. {Localization.Get("BattleActionAttack", weapon.Name)}");
+                Console.WriteLine($"2. {Localization.Get("BattleActionAttack", shield.Name, 999)}"); // <<< добавить в конце шанс блока
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
 
             // Waiting for user Input
@@ -343,13 +344,19 @@ namespace Game.UI
                 {
                     case "1":
                         if (weapon != null)
+                            {
+                            Console.Write("Attack".PadRight(Console.WindowWidth));
                             return Game.Battle.BattleAction.Attack;
+                        }
                         Console.SetCursorPosition(0, errorTop);
                         Console.Write(Localization.Get("BattleNoWeapon").PadRight(Console.WindowWidth));
                         break;
                     case "2":
                         if (shield != null)
+                        {
+                            Console.Write("Block".PadRight(Console.WindowWidth));
                             return Game.Battle.BattleAction.Block;
+                        }
                         Console.SetCursorPosition(Localization.Get("UI_SelectOption").Length, errorTop);
                         Console.Write(Localization.Get("BattleNoShield").PadRight(Console.WindowWidth));
                         break;
@@ -370,16 +377,16 @@ namespace Game.UI
 
             if (bow == null)
             {
-                Console.WriteLine("2. Open inventory");
-                Console.WriteLine("3. Open equipment");
-                Console.WriteLine("4. Do nothing (Skip timer)");
+                Console.WriteLine($"2. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionNone")}");
             }
             else
             {
-                Console.WriteLine($"1. Attack using {bow.Name}");
-                Console.WriteLine("2. Open inventory");
-                Console.WriteLine("3. Open equipment");
-                Console.WriteLine("4. Do nothing (Skip timer)");
+                Console.WriteLine($"1. {Localization.Get("BattleActionAttack", bow.Name)}");
+                Console.WriteLine($"2. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionNone")}");
             }
 
             // Waiting for user Input
@@ -410,7 +417,10 @@ namespace Game.UI
                 {
                     case "1":
                         if (bow != null)
+                        {
+                            Console.Write("Attack".PadRight(Console.WindowWidth));
                             return Game.Battle.BattleAction.Attack;
+                        }
                         Console.SetCursorPosition(0, errorTop);
                         Console.Write(Localization.Get("BattleNoWeapon").PadRight(Console.WindowWidth));
                         break;
@@ -432,24 +442,25 @@ namespace Game.UI
 
             if (wand == null || spellBook == null)
             {
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else if (spellBook.SelectedSpell == null)
             {
-                Console.WriteLine($"2. Select a spell from {spellBook.Name}");
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                Console.WriteLine($"2. {Localization.Get("BattleActionSelectSpell", spellBook.Name)}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else
             {
-                Console.WriteLine($"1. Cast {spellBook.SelectedSpell.Name} using {wand.Name}");
-                Console.WriteLine($"2. Select a spell from {spellBook.Name}");
-                Console.WriteLine("3. Open inventory");
-                Console.WriteLine("4. Open equipment");
-                Console.WriteLine("5. Do nothing (Skip timer)");
+                //Cast {spellBook.SelectedSpell.Name} using {wand.Name}
+                Console.WriteLine($"1. {Localization.Get("BattleActionCastSpell", spellBook.SelectedSpell.Name, wand.Name)}");
+                Console.WriteLine($"2. {Localization.Get("BattleActionSelectSpell", spellBook.Name)}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
 
             // Waiting for user Input
@@ -480,7 +491,10 @@ namespace Game.UI
                 {
                     case "1":
                         if (spellBook?.SelectedSpell != null)
-                            return Game.Battle.BattleAction.CastSpell;
+                        {
+                            Console.Write("Cast a spell".PadRight(Console.WindowWidth));
+                            return Game.Battle.BattleAction.Attack;
+                        }
                         Console.SetCursorPosition(0, errorTop);
                         Console.Write(Localization.Get("BattleNoSpell").PadRight(Console.WindowWidth));
                         break;

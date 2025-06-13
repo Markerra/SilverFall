@@ -88,6 +88,27 @@
   <data name="BattleActions" xml:space="preserve">
     <value>Actions: </value>
   </data>
+  <data name="BattleActionAttack" xml:space="preserve">
+    <value>Attack using {0}</value>
+  </data>
+  <data name="BattleActionBlock" xml:space="preserve">
+    <value>Try to block using {0} ({1}%)</value>
+  </data>
+  <data name="BattleActionSelectSpell" xml:space="preserve">
+    <value>Select a spell from {0}</value>
+  </data>
+  <data name="BattleActionCastSpell" xml:space="preserve">
+    <value>Cast {0} using {1}</value>
+  </data>
+  <data name="BattleActionInventory" xml:space="preserve">
+    <value>Open inventory</value>
+  </data>
+  <data name="BattleActionEquipment" xml:space="preserve">
+    <value>Open equipment</value>
+  </data>
+  <data name="BattleActionNone" xml:space="preserve">
+    <value>Do nothing (Skip timer)</value>
+  </data>
   <data name="BattleSecRemains" xml:space="preserve">
     <value>Time left: {0}s</value>
   </data>

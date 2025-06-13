@@ -1,6 +1,12 @@
 namespace Game
 {
-    class Weapon : Equipment
+
+    interface IAttackWeapon
+    {
+        void Attack(Entity attacker, Entity target);
+    }
+
+    class Weapon : Equipment, IAttackWeapon
     {
         public WeaponStats Stats { get; set; }
         public ICombatStyle CombatStyle { get; set; }
@@ -10,9 +16,21 @@ namespace Game
             this.CombatStyle = new KnightCombat();
         }
 
-        public virtual void OnAttack(Entity attacker, Entity target)
+        public virtual void Attack(Entity attacker, Entity target)
         {
-            // Default: no special effect
+            // Default attack logic (can be overridden in subclasses)
+            float damageDealt = Stats.Damage;
+            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
+            {
+                damageDealt *= Stats.CritMultiplier;
+                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
+            }
+            else
+            {
+                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
+            }
+            target.TakeDamage(damageDealt, attacker);
+            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
         }
 
         public void GetWeaponInfo()
@@ -29,9 +47,22 @@ namespace Game
             CombatStyle = new KnightCombat();
         }
 
-        public override void OnAttack(Entity attacker, Entity target)
+        public override void Attack(Entity attacker, Entity target)
         {
-            // Default: no special effect
+            // Default attack logic (can be overridden in subclasses)
+            // Example:
+            float damageDealt = Stats.Damage;
+            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
+            {
+                damageDealt *= Stats.CritMultiplier;
+                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
+            }
+            else
+            {
+                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
+            }
+            target.TakeDamage(damageDealt, attacker);
+            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
         }
     }
     
@@ -42,9 +73,22 @@ namespace Game
             CombatStyle = new KnightCombat();
         }
 
-        public override void OnAttack(Entity attacker, Entity target)
+        public override void Attack(Entity attacker, Entity target)
         {
-            // Default: no special effect
+            // Default attack logic (can be overridden in subclasses)
+            // Example:
+            float damageDealt = Stats.Damage;
+            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
+            {
+                damageDealt *= Stats.CritMultiplier;
+                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
+            }
+            else
+            {
+                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
+            }
+            target.TakeDamage(damageDealt, attacker);
+            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
         }
     }
 
@@ -55,9 +99,22 @@ namespace Game
             CombatStyle = new ArcherCombat();
         }
 
-        public override void OnAttack(Entity attacker, Entity target)
+        public override void Attack(Entity attacker, Entity target)
         {
-            // Default: no special effect
+            // Default attack logic (can be overridden in subclasses)
+            // Example:
+            float damageDealt = Stats.Damage;
+            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
+            {
+                damageDealt *= Stats.CritMultiplier;
+                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
+            }
+            else
+            {
+                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
+            }
+            target.TakeDamage(damageDealt, attacker);
+            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
         }
 
     }
@@ -69,32 +126,42 @@ namespace Game
         {
             CombatStyle = new MagicianCombat();
         }
-
-        public override void OnAttack(Entity attacker, Entity target)
+        
+        public override void Attack(Entity attacker, Entity target)
         {
-            // Default: no special effect
+            // Assume attacker has a SpellBook and a selected spell
+            var spellBook = attacker.Equipment.SpellBook;
+            Spell? spell = spellBook?.SelectedSpell;
+            
+            if (spellBook == null) { throw new NullReferenceException("Can't cast a spell when SpellBook is null"); }
+            if (spell == null) { spellBook.SelectSpell(); }
+            else
+            {
+                if (CastSpell(attacker, target, spell))
+                {
+                    // Calculate spell damage
+                    float baseDamage = spell.Stats.Damage;
+                    float intBonus = attacker.Stats.SpellAmplify;
+                    float totalDamage = baseDamage + intBonus;
+
+                    Console.WriteLine($"{attacker.Name} casts {spell.Name} for {totalDamage} damage.");
+
+                    // Apply damage to target
+                    target.TakeDamage(totalDamage, attacker);
+                }
+            }
         }
 
-        public bool CastSpell(Entity target)
+        public bool CastSpell(Entity attacker, Entity target, Spell spell)
         {
-            Entity? owner = Owner;
-            if (owner == null)
-            {
-                GameLog.Write("CastSpell() failed: owner is null.");
-                throw new NullReferenceException($"Cannot cast spell when {Name}'s owner is null");
-            }
-            SpellBook? spellBook = owner.Equipment.SpellBook;
-            Spell? spell = null;
+            SpellBook? spellBook = attacker.Equipment.SpellBook;
             if (spellBook == null) { Console.WriteLine("You don't have a spell book equiped!"); return false; }
-            else { spell = spellBook.SelectedSpell; }
-            if (spell == null) { spellBook.SelectSpell(); return false; }
             List<ConsoleKey> input = new List<ConsoleKey>();
             bool failed = false;
-            
 
             // Some AI generated stuff that i don't understand
             List<char> openKeys = new List<char>();
-            int openKeysAmount = (int) Math.Round(spell.KeyCombo.Length * (_showSpellComboPct / 100));
+            int openKeysAmount = (int)Math.Round(spell.KeyCombo.Length * (_showSpellComboPct / 100));
             for (int i = 0; i < openKeysAmount;)
             {
                 ConsoleKey randomKey = spell.KeyCombo[GameRandom.Instance.Next(0, spell.KeyCombo.Length)];
@@ -112,7 +179,7 @@ namespace Game
 
             string spellCastingTitle = "- Spell Casting -";
             string spellCastingStatus;
-            
+
             // Build the display string: show revealed keys, hide others with '-'
             void updateDisplayCombo()
             {
@@ -147,7 +214,7 @@ namespace Game
 
             for (int i = 0; i < spell.KeyCombo.Length; i++)
             {
-                if (owner.Stats.Mana < spell.Stats.ManaCost)
+                if (attacker.Stats.Mana < spell.Stats.ManaCost)
                 {
                     Console.WriteLine("Not enough mana!");
                     return false;
@@ -156,8 +223,8 @@ namespace Game
                 ConsoleKey consoleKey = key.Key;
                 input.Add(consoleKey);
                 openKeys.Add(key.KeyChar);
-                owner.Stats.Mana -= spell.Stats.ManaCost;
-                GameLog.Write($"{owner.Name} spent {spell.Stats.ManaCost} mana");
+                attacker.Stats.Mana -= spell.Stats.ManaCost;
+                GameLog.Write($"{attacker.Name} spent {spell.Stats.ManaCost} mana");
                 if (consoleKey != spell.KeyCombo[i])
                 {
                     Console.WriteLine("Wrong character spelled! ");
@@ -166,7 +233,7 @@ namespace Game
                     break;
                 }
                 Console.Clear();
-                displayCombo = "";  
+                displayCombo = "";
                 updateDisplayCombo();
                 spellCastingStatus = $"You're casting \"{spell.Name}\" [{displayCombo.Trim()}] on {target.Name} ({target.Level} LVL)";
                 Console.WriteLine(spellCastingTitle);
@@ -175,7 +242,7 @@ namespace Game
 
             if (!failed)
             {
-                spell.Cast(owner, target);
+                spell.Cast(attacker, target);
                 return true;
             }
 

@@ -31,12 +31,16 @@ namespace Game
                 { eTurn = Attacker; attackerWeapon.CombatStyle.MakeTurn(this, Attacker, Target); } // Make a turn
                 else { throw new NullReferenceException($"Attacker {Attacker.Name} doesn't have any weapon equipped!"); }
 
+                Thread.Sleep(10); // Small Delay
+
                 if (!Target.IsAlive) { break; }
 
                 // Target's turn
                 if (targetWeapon != null)
                 { eTurn = Target; targetWeapon.CombatStyle.MakeTurn(this, Target, Attacker, AI: true); } // Make a turn
                 else { throw new NullReferenceException($"Attacker {Target.Name} doesn't have any weapon equipped!"); }
+           
+                Thread.Sleep(10); // Small Delay
             }
         }
 
@@ -82,7 +86,12 @@ namespace Game
             // The playerActionLoop receives a function to check if time is up
             playerActionLoop(
                 () => (DateTime.Now - turnStart).TotalSeconds >= seconds || timeUp,
-                () => timeUp = true);
+                () => {
+                    // endTurn() method
+                    timeUp = true;
+                    Console.Write(""); 
+                    
+                });
 
             timeUp = true; // Ensure timer stops if player ends early
             timerTask.Wait();
@@ -93,7 +102,6 @@ namespace Game
             None,
             Attack,
             Block,
-            CastSpell,
             SelectSpell,
             Inventory,
             Equipment
@@ -115,20 +123,21 @@ namespace Game
             if (!attacker.IsInBattle() || !target.IsInBattle()) { throw new ArgumentException("Can't make a turn when attacker/target isn't in a battle"); }
             if (attacker is Player player)
             {
-                Battle.TimedPlayerTurn(5, (isTimeUp, endTurn) =>
+                Battle.TimedPlayerTurn(30, (isTimeUp, endTurn) =>
                 {
                     while (!isTimeUp())
                     {
                         // Per-action input logic
+
                         UI.Battle.ShowBattleInfo(battle);
 
-                        // Shows and stores the user's battle action
-                        switch (UI.Battle.ShowBattleOptions(battle, PlayerClasses.Detector(player), isTimeUp))
+                        Battle.BattleAction action = UI.Battle.ShowBattleOptions(battle, PlayerClasses.Detector(player), isTimeUp);
+                        switch (action)
                         {
-                            case Battle.BattleAction.Attack: GameLog.Write("Attack"); endTurn(); return;
+                            // Ending the turn before the action is needed for properly updated UI
+                            case Battle.BattleAction.Attack: endTurn(); attacker.Attack(target); return;
                             case Battle.BattleAction.Block: GameLog.Write("Block"); endTurn(); return;
-                            case Battle.BattleAction.SelectSpell: GameLog.Write("SelectSpell"); endTurn(); break;
-                            case Battle.BattleAction.CastSpell: GameLog.Write("CastSpell"); endTurn(); break;
+                            case Battle.BattleAction.SelectSpell: endTurn(); attacker.Equipment.SpellBook?.SelectSpell(); break;
                             case Battle.BattleAction.Equipment: GameLog.Write("Equipment"); break;
                             case Battle.BattleAction.Inventory: GameLog.Write("Inventory"); break;
                             default: endTurn(); return; // None - skips the timer

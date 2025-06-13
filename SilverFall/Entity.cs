@@ -55,10 +55,34 @@ namespace Game
 
         public void TakeDamage(float damage, Entity attacker)
         {
-            Stats.Health -= Math.Max(0, damage);
-            if (Stats.Health == 0)
+             // Apply defense reduction
+            float effectiveDamage = damage * (1 - Stats.Defense / 100);
+
+            // Reduce health
+            Stats.Health -= effectiveDamage;
+        
+            // Log the damage
+            GameLog.Write($"{Name} takes {effectiveDamage} damage from {attacker.Name}. (HP: {Stats.Health}/{Stats.MaxHealth})");
+        
+            // Check for death
+            if (Stats.Health <= 0 && IsAlive)
             {
+                IsAlive = false;
+                GameLog.Write($"{Name} has been defeated!");
                 OnDeath?.Invoke(attacker);
+            }
+        }
+
+        public void Attack(Entity target)
+        {
+            if (Equipment.Weapon is IAttackWeapon attackWeapon)
+            {
+                GameLog.Write($"{Name} attacks {target} with {Equipment.Weapon.Name}");
+                attackWeapon.Attack(this, target);
+            }
+            else
+            {
+                Console.WriteLine($"{Name} has no weapon to attack with!");
             }
         }
 
@@ -112,37 +136,6 @@ namespace Game
                 return true;
             }
             return false;
-        }
-
-        public void Attack(Entity target, Weapon weapon)
-        {
-            if (target == null)
-            {
-                Console.WriteLine("Target is null. Cannot attack.");
-                return;
-            }
-
-            weapon.OnAttack(this, target);
-
-            if (GameRandom.Instance.Next(0, 100) < target.Stats.MissChance)
-            {
-                Console.WriteLine($"{Name} missed the attack on {target.Name}!");
-                return;
-            }
-
-            float damageDealt = weapon.Stats.Damage * (1 - target.Stats.Defense / 100);
-            if (GameRandom.Instance.Next(0, 100) < weapon.Stats.CritChance)
-            {
-                damageDealt *= weapon.Stats.CritMultiplier;
-                Console.WriteLine($"{Name} landed a critical hit with {damageDealt} damage!");
-            }
-            else
-            {
-                Console.WriteLine($"{Name} attacked {target.Name} for {damageDealt} damage.");
-            }
-
-            target.TakeDamage(damageDealt, this);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
         }
 
         public void Heal(float amount)

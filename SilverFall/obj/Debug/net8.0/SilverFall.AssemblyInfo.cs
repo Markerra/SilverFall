@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SilverFall")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+23685017fc9a130bcac8290144a8890e60cc5142")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a577a041c05dcfdfc6d207516920a560727842e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("SilverFall")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SilverFall")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

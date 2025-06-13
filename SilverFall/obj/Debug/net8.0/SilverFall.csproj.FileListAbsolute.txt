@@ -13,3 +13,9 @@ c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFal
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.genruntimeconfig.cache
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\ref\SilverFall.dll
 c:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.sourcelink.json
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\bin\Debug\net8.0\ru\SilverFall.resources.dll
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.Resources.Lang.resources
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.Resources.Lang.ru.resources
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\SilverFall.csproj.GenerateResource.cache
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\ru\SilverFall.resources.cs
+C:\Users\Igor\Documents\VS Code\SilverFall\SilverFall\obj\Debug\net8.0\ru\SilverFall.resources.dll
