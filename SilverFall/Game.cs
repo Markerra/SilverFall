@@ -9,7 +9,7 @@ namespace Game
 
     static class GameManager
     {
-        public static Player Player = new Player(new Stats(), "Player");
+        public static Player Player = new Player(new Stats(true), "Player");
         public static GameSave Save = new GameSave();
         public static Battle? Battle;
         public static int Stage = -1;
@@ -52,7 +52,7 @@ namespace Game
         {
             Name = "EmptySave";
             Seed = 0;
-            Player = new Player(new Stats(), Name);
+            Player = new Player(new Stats(true), "Player");
             Stage = GameManager.Stage;
             isDev = GameOptions.isDev;
             language = GameOptions.lang;

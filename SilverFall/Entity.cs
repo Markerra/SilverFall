@@ -6,49 +6,30 @@ namespace Game
         public int Experience { get; set; } = 0;
         public int[] ExpTable { get; set; } = [0, 800, 2400, 5000, 8000, 13000, 19500, 27000, 34000, 43000];
         public int Level { get; set; } // Level increases all stats by 11% per level
+        public bool IsAlive = true;
 
-        private Stats _stats { get; set; }
-        private Stats _bonusStats { get; set; }
-        public Stats Stats
-        {
-            get
-            {
-                // Creating copy of base stats
-                var totalStats = new Stats();
-                totalStats.AddStats(_stats); // Add current base stats
-                totalStats.AddStats(_bonusStats); // Add current bonus stats
-                return totalStats; // Return total stats
-            }
-            set { _stats = value; }
-        }
-
+        public Stats Stats { get; set; }
         public EquipmentSlots Equipment { get; set; }
         public List<Item> Inventory { get; set; }
+
         public event Action<Entity>? OnDeath;
         public event Action? OnLevelUp;
-        public bool IsAlive = true;
 
         public Entity()
         {
-            _stats = new Stats();
-            _bonusStats = new Stats();
-
-            Stats = new Stats();
             Name = "Entity";
             Level = 1;
             Equipment = new EquipmentSlots();
             Inventory = new List<Item>();
+            Stats = new Stats(true);
         }
         public Entity(Stats baseStats, string name, int level)
         {
-            _stats = new Stats();
-            _bonusStats = new Stats();
-
-            Stats = baseStats;
             Name = name;
             Level = level;
             Equipment = new EquipmentSlots();
             Inventory = new List<Item>();
+            Stats = baseStats;
 
             OnDeath += (attacker) => { IsAlive = false; };
         }
@@ -56,7 +37,7 @@ namespace Game
         public void TakeDamage(float damage, Entity attacker)
         {
              // Apply defense reduction
-            float effectiveDamage = damage * (1 - Stats.Defense / 100);
+            float effectiveDamage = damage * (100 - Stats.Defense) / 100;
 
             // Reduce health
             Stats.Health -= effectiveDamage;
@@ -68,22 +49,15 @@ namespace Game
             if (Stats.Health <= 0 && IsAlive)
             {
                 IsAlive = false;
-                GameLog.Write($"{Name} has been defeated!");
+                GameLog.Write(Localization.Get("EntityDefeated"));
                 OnDeath?.Invoke(attacker);
             }
         }
 
         public void Attack(Entity target)
         {
-            if (Equipment.Weapon is IAttackWeapon attackWeapon)
-            {
-                GameLog.Write($"{Name} attacks {target} with {Equipment.Weapon.Name}");
-                attackWeapon.Attack(this, target);
-            }
-            else
-            {
-                Console.WriteLine($"{Name} has no weapon to attack with!");
-            }
+            if (Equipment.Weapon is IAttackWeapon attackWeapon) { attackWeapon.Attack(this, target); }
+            else { Console.WriteLine($"{Name} has no weapon to attack with!"); }
         }
 
         public void Equip(Equipment equipment)
@@ -91,32 +65,59 @@ namespace Game
             switch (equipment)
             {
                 case Helmet helmet:
-                    if (Equipment.Head != null) { AddItem(Equipment.Head); }
+                    if (Equipment.Head != null) { Unequip(Equipment.Head); }
                     Equipment.Head = helmet; break;
                 case Chestplate chest:
-                    if (Equipment.Chest != null) { AddItem(Equipment.Chest); }
+                    if (Equipment.Chest != null) { Unequip(Equipment.Chest); }
                     Equipment.Chest = chest; break;
                 case Leggings legs:
-                    if (Equipment.Legs != null) { AddItem(Equipment.Legs); }
+                    if (Equipment.Legs != null) { Unequip(Equipment.Legs); }
                     Equipment.Legs = legs; break;
                 case Boots boots:
-                    if (Equipment.Feet != null) { AddItem(Equipment.Feet); }
+                    if (Equipment.Feet != null) { Unequip(Equipment.Feet); }
                     Equipment.Feet = boots; break;
                 case Gloves gloves:
-                    if (Equipment.Hands != null) { AddItem(Equipment.Hands); }
+                    if (Equipment.Hands != null) { Unequip(Equipment.Hands); }
                     Equipment.Hands = gloves; break;
                 case Necklace necklace:
-                    if (Equipment.Necklace != null) { AddItem(Equipment.Necklace); }
+                    if (Equipment.Necklace != null) { Unequip(Equipment.Necklace); }
                     Equipment.Necklace = necklace; break;
                 case Shield shield:
-                    if (Equipment.Offhand != null) { AddItem(Equipment.Offhand); }
+                    if (Equipment.Offhand != null) { Unequip(Equipment.Offhand); }
                     Equipment.Offhand = shield; break;
                 case Weapon weapon:
-                    if (Equipment.Weapon != null) { AddItem(Equipment.Weapon); }
+                    if (Equipment.Weapon != null) { Unequip(Equipment.Weapon); }
                     Equipment.Weapon = weapon; break;
                 case SpellBook spellBook:
-                    if (Equipment.SpellBook != null) { AddItem(Equipment.SpellBook); }
+                    if (Equipment.SpellBook != null) { Unequip(Equipment.SpellBook); }
                     Equipment.SpellBook = spellBook; break;
+                default: throw new ArgumentException("Unknown equipment type");
+            }
+            Stats.AddStats(equipment.BonusStats);
+        }
+
+        public void Unequip(Equipment equipment)
+        {
+            switch (equipment)
+            {
+                case Helmet helmet: if(Equipment.Head == equipment) 
+                { Equipment.Head = null; AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Chestplate chest: if(Equipment.Chest == equipment) 
+                { Equipment.Chest = null;  AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Leggings legs: if(Equipment.Legs == equipment) 
+                { Equipment.Legs = null; AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Boots boots: if(Equipment.Feet == equipment) 
+                { Equipment.Feet = null; AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Gloves gloves: if(Equipment.Hands == equipment) 
+                { Equipment.Hands = null;  AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Necklace necklace: if(Equipment.Hands == equipment) 
+                { Equipment.Hands = null;  AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Shield shield: if(Equipment.Offhand == equipment) 
+                { Equipment.Offhand = null;    AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case Weapon weapon: if(Equipment.Weapon == equipment) 
+                { Equipment.Weapon = null;   AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
+                case SpellBook spellBook: if(Equipment.SpellBook == equipment) 
+                { Equipment.SpellBook = null;      AddItem(equipment); Stats.RemoveStats(equipment.BonusStats); }  break;
                 default: throw new ArgumentException("Unknown equipment type");
             }
         }
@@ -125,6 +126,13 @@ namespace Game
         {
             Equipment? eq = (Equipment?)Inventory.Find(item => item.Name == name);
             if (eq != null) { Equip(eq); }
+        
+        }
+
+        public void Unequip(string name)
+        {
+            Equipment? eq = (Equipment?)Inventory.Find(item => item.Name == name);
+            if (eq != null) { Unequip(eq); }
         }
 
         public bool EquipFirst<T>() where T : Equipment
@@ -140,7 +148,7 @@ namespace Game
 
         public void Heal(float amount)
         {
-            Stats.Health += amount;
+            Stats.Health = Math.Min(Stats.Health + amount, Stats.MaxHealth);
         }
 
         public void GiveExp(int amount)
@@ -218,23 +226,6 @@ namespace Game
                     Console.WriteLine($"{item.Name} \n{item.Description}");
                 }
             }
-        }
-
-        public void CalculateBonusStats()
-        {
-            // Reset current bonus stats
-            _bonusStats = new Stats();
-
-            // Add bonus stats from each equipped item if present
-            if (Equipment.Head != null) _bonusStats.AddStats(Equipment.Head.BonusStats);
-            if (Equipment.Chest != null) _bonusStats.AddStats(Equipment.Chest.BonusStats);
-            if (Equipment.Legs != null) _bonusStats.AddStats(Equipment.Legs.BonusStats);
-            if (Equipment.Feet != null) _bonusStats.AddStats(Equipment.Feet.BonusStats);
-            if (Equipment.Hands != null) _bonusStats.AddStats(Equipment.Hands.BonusStats);
-            if (Equipment.Necklace != null) _bonusStats.AddStats(Equipment.Necklace.BonusStats);
-            if (Equipment.Offhand != null) _bonusStats.AddStats(Equipment.Offhand.BonusStats);
-            if (Equipment.Weapon != null) _bonusStats.AddStats(Equipment.Weapon.BonusStats);
-            if (Equipment.SpellBook != null) _bonusStats.AddStats(Equipment.SpellBook.BonusStats);
         }
 
         public bool IsInBattle()

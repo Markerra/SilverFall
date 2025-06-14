@@ -9,11 +9,9 @@ namespace Game
     class Weapon : Equipment, IAttackWeapon
     {
         public WeaponStats Stats { get; set; }
-        public ICombatStyle CombatStyle { get; set; }
         public Weapon(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, "Weapon", stats)
         {
-            this.Stats = stats;
-            this.CombatStyle = new KnightCombat();
+            Stats = stats;
         }
 
         public virtual void Attack(Entity attacker, Entity target)
@@ -23,14 +21,15 @@ namespace Game
             if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
             {
                 damageDealt *= Stats.CritMultiplier;
-                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
+                Console.WriteLine(Localization.Get("WeaponAttackDamageDealtCritical", attacker.Name, damageDealt));
             }
             else
             {
-                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
+                Console.WriteLine(Localization.Get("WeaponAttackDamageDealt", attacker.Name, target.Name, damageDealt));
             }
             target.TakeDamage(damageDealt, attacker);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
+            if (target.IsAlive)
+                Console.WriteLine(Localization.Get("WeaponAttackTargetHealth", target.Name, target.Stats.Health));
         }
 
         public void GetWeaponInfo()
@@ -42,90 +41,25 @@ namespace Game
     class Sword : Weapon
     {
 
-        public Sword(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats)
-        {
-            CombatStyle = new KnightCombat();
-        }
+        public Sword(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats) {}
 
-        public override void Attack(Entity attacker, Entity target)
-        {
-            // Default attack logic (can be overridden in subclasses)
-            // Example:
-            float damageDealt = Stats.Damage;
-            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
-            {
-                damageDealt *= Stats.CritMultiplier;
-                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
-            }
-            else
-            {
-                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
-            }
-            target.TakeDamage(damageDealt, attacker);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
-        }
     }
     
     class HeavyWeapon : Weapon
     {
-        public HeavyWeapon(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats)
-        {
-            CombatStyle = new KnightCombat();
-        }
-
-        public override void Attack(Entity attacker, Entity target)
-        {
-            // Default attack logic (can be overridden in subclasses)
-            // Example:
-            float damageDealt = Stats.Damage;
-            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
-            {
-                damageDealt *= Stats.CritMultiplier;
-                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
-            }
-            else
-            {
-                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
-            }
-            target.TakeDamage(damageDealt, attacker);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
-        }
+        public HeavyWeapon(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats) {}
     }
 
     class Bow : Weapon
     {
-        public Bow(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats)
-        {
-            CombatStyle = new ArcherCombat();
-        }
-
-        public override void Attack(Entity attacker, Entity target)
-        {
-            // Default attack logic (can be overridden in subclasses)
-            // Example:
-            float damageDealt = Stats.Damage;
-            if (GameRandom.Instance.Next(0, 100) < Stats.CritChance)
-            {
-                damageDealt *= Stats.CritMultiplier;
-                Console.WriteLine($"{attacker.Name} landed a critical hit with {damageDealt} damage!");
-            }
-            else
-            {
-                Console.WriteLine($"{attacker.Name} attacked {target.Name} for {damageDealt} damage.");
-            }
-            target.TakeDamage(damageDealt, attacker);
-            Console.WriteLine($"{target.Name} now has {target.Stats.Health} health remaining.");
-        }
+        public Bow(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats) {}
 
     }
 
     class MagicWand : Weapon
     {
         private static float _showSpellComboPct = 35; // % Of showing spell combo in UI when casting
-        public MagicWand(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats)
-        {
-            CombatStyle = new MagicianCombat();
-        }
+        public MagicWand(string name, string description, string rarity, WeaponStats stats) : base(name, description, rarity, stats) {}
         
         public override void Attack(Entity attacker, Entity target)
         {
@@ -144,7 +78,7 @@ namespace Game
                     float intBonus = attacker.Stats.SpellAmplify;
                     float totalDamage = baseDamage + intBonus;
 
-                    Console.WriteLine($"{attacker.Name} casts {spell.Name} for {totalDamage} damage.");
+                    Console.WriteLine(Localization.Get("MagicWandDamageDealt", attacker.Name, spell.Name, totalDamage));;
 
                     // Apply damage to target
                     target.TakeDamage(totalDamage, attacker);
@@ -176,9 +110,9 @@ namespace Game
             }
 
             string displayCombo = "";
-
-            string spellCastingTitle = "- Spell Casting -";
             string spellCastingStatus;
+
+            Console.CursorVisible = false;
 
             // Build the display string: show revealed keys, hide others with '-'
             void updateDisplayCombo()
@@ -198,47 +132,46 @@ namespace Game
                     else
                         displayCombo += "- ";
                 }
-                spellCastingStatus = Localization.Get(
-                    "spellCastingStatus",
-                    spell.Name,
-                    displayCombo.Trim(),
-                    target.Name,
-                    target.Level
-                );
+                spellCastingStatus = Localization.Get( "SpellCastingStatus", spell.Name, displayCombo.Trim(), target.Name, target.Level);
             }
 
             updateDisplayCombo();
 
-            Console.WriteLine(spellCastingTitle);
+            int top = Console.CursorTop;
+
             Console.WriteLine(spellCastingStatus);
 
             for (int i = 0; i < spell.KeyCombo.Length; i++)
             {
-                if (attacker.Stats.Mana < spell.Stats.ManaCost)
+                Console.SetCursorPosition(0, top);
+                if (attacker.Stats.Mana < spell.Stats.GetManaCost(Owner))
                 {
+                    Console.Write(new string(' ', Console.WindowWidth));
+                    Console.SetCursorPosition(0, top);
                     Console.WriteLine("Not enough mana!");
                     return false;
                 }
                 var key = Console.ReadKey(true);
                 ConsoleKey consoleKey = key.Key;
                 input.Add(consoleKey);
-                openKeys.Add(key.KeyChar);
-                attacker.Stats.Mana -= spell.Stats.ManaCost;
-                GameLog.Write($"{attacker.Name} spent {spell.Stats.ManaCost} mana");
+                openKeys.Add(key.KeyChar.ToString().ToUpper().ToCharArray()[0]);
+                attacker.Stats.Mana -= spell.Stats.GetManaCost(Owner);
                 if (consoleKey != spell.KeyCombo[i])
                 {
-                    Console.WriteLine("Wrong character spelled! ");
+                    Console.Write(new string(' ', Console.WindowWidth));
+                    Console.SetCursorPosition(0, top);
+                    Console.WriteLine(Localization.Get("SpellCastingWrongChar"));
                     GameLog.Write($"CastSpell() for {Name} failed: Wrong key pressed. ({consoleKey} pressed, {spell.KeyCombo[i]} expected)");
                     failed = true;
                     break;
                 }
-                Console.Clear();
                 displayCombo = "";
                 updateDisplayCombo();
-                spellCastingStatus = $"You're casting \"{spell.Name}\" [{displayCombo.Trim()}] on {target.Name} ({target.Level} LVL)";
-                Console.WriteLine(spellCastingTitle);
+                spellCastingStatus = Localization.Get( "SpellCastingStatus", spell.Name, displayCombo.Trim(), target.Name, target.Level);
                 Console.WriteLine(spellCastingStatus);
             }
+
+            Console.CursorVisible = true;
 
             if (!failed)
             {

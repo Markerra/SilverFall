@@ -83,7 +83,8 @@ namespace Game
             for (int i = 0; i < Spells.Count; i++)
             {
                 Spell spell = Spells[i];
-                string text = $"{i + 1}. {spell.Name} (Damage: {spell.Stats.Damage}, Cost: {spell.Stats.ManaCost})";
+                string text = $"{i + 1}. {spell.Name} (Damage: {spell.Stats.Damage}"
+                + $"Cost: {spell.Stats.GetManaCost(Owner)})";
                 if (SelectedSpell != spell) { Console.WriteLine(text); } else { Console.WriteLine(text + " [selected]"); }
             }
             Console.WriteLine(" >> Select your spell: ");
@@ -95,7 +96,7 @@ namespace Game
                 if (char.IsDigit(c))
                 {
                     int digit = c - 48; // IDK HOW IT WORKS BUT IT WORKS. DONT CHANGE THIS NUMBER
-                    if (digit > 0 && digit <= Spells.Count) {index = digit; GameLog.Write($"index: {index}"); break;}
+                    if (digit > 0 && digit <= Spells.Count) { index = digit; GameLog.Write($"index: {index}"); break; }
                 }
             }
             SelectedSpell = Spells[index - 1];

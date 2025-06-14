@@ -44,14 +44,14 @@ namespace Game.Items
             "Iron Helmet",
             "A sturdy iron helmet. Increases Strength and Defense.",
             "Common",
-            new Stats() { Strength = 2, Defense = 5 }
+            new Stats(false) { Strength = 2, Defense = 5 }
         );
 
         public static Helmet DragonHelm = new Helmet(
             "Dragon Helm",
             "A legendary helm forged from dragon scales. Greatly increases Strength and Defense.",
             "Legendary",
-            new Stats() { Strength = 10, Defense = 20, Agility = 2 }
+            new Stats(false) { Strength = 10, Defense = 20, Agility = 2 }
         );
 
         // All Chestplates
@@ -60,14 +60,14 @@ namespace Game.Items
             "Leather Armor",
             "Light armor made from tough leather. Increases Agility and Defense.",
             "Common",
-            new Stats() { Agility = 3, Defense = 4 }
+            new Stats(false) { Agility = 3, Defense = 4 }
         );
 
         public static Chestplate KnightArmor = new Chestplate(
             "Knight's Armor",
             "Heavy armor worn by knights. Greatly increases Strength and Defense, but reduces Agility.",
             "Rare",
-            new Stats() { Strength = 5, Defense = 15, Agility = -2 }
+            new Stats(false) { Strength = 5, Defense = 15, Agility = -2 }
         );
 
         // All Leggings
@@ -76,14 +76,14 @@ namespace Game.Items
             "Iron Leggings",
             "Iron leggings that offer solid protection.",
             "Common",
-            new Stats() { Defense = 6 }
+            new Stats(false) { Defense = 6 }
         );
 
         public static Leggings ShadowLeggings = new Leggings(
             "Shadow Leggings",
             "Leggings that grant the wearer swift movement.",
             "Rare",
-            new Stats() { Agility = 7, Defense = 3 }
+            new Stats(false) { Agility = 7, Defense = 3 }
         );
 
         // All Boots
@@ -92,14 +92,14 @@ namespace Game.Items
             "Swift Boots",
             "Boots that increase your speed and agility.",
             "Uncommon",
-            new Stats() { Agility = 6 }
+            new Stats(false) { Agility = 6 }
         );
 
         public static Boots StoneBoots = new Boots(
             "Stone Boots",
             "Heavy boots that offer great protection but slow you down.",
             "Rare",
-            new Stats() { Defense = 8, Agility = -3 }
+            new Stats(false) { Defense = 8, Agility = -3 }
         );
 
         // All Gloves
@@ -108,14 +108,14 @@ namespace Game.Items
             "Thief's Gloves",
             "Gloves favored by thieves. Increase Agility.",
             "Common",
-            new Stats() { Agility = 4 }
+            new Stats(false) { Agility = 4 }
         );
 
         public static Gloves GauntletsOfMight = new Gloves(
             "Gauntlets of Might",
             "Heavy gauntlets that boost Strength.",
             "Uncommon",
-            new Stats() { Strength = 4 }
+            new Stats(false) { Strength = 4 }
         );
 
         // All Necklaces
@@ -124,14 +124,14 @@ namespace Game.Items
             "Amulet of Wisdom",
             "A magical amulet that increases Intelligence.",
             "Rare",
-            new Stats() { Intelligence = 8 }
+            new Stats(false) { Intelligence = 8 }
         );
 
         public static Necklace RubyPendant = new Necklace(
             "Ruby Pendant",
             "A pendant that slightly increases all stats.",
             "Uncommon",
-            new Stats() { Strength = 2, Agility = 2, Intelligence = 2 }
+            new Stats(false) { Strength = 2, Agility = 2, Intelligence = 2 }
         );
 
         // All Shields
@@ -140,7 +140,7 @@ namespace Game.Items
             "Wooden Shield",
             "A simple wooden shield",
             "Common",
-            new Stats() { Defense = 2 } // At the bottom add shield blocking logic for knight class
+            new Stats(false) { Defense = 2 } // At the bottom add shield blocking logic for knight class
         );
 
         // Weapons
@@ -183,7 +183,7 @@ namespace Game.Items
             damage: 65,
             critChance: 25,
             critMult: 2.3F,
-            new Stats() { Strength = 20, Agility = -5 }));
+            new Stats(false) { Strength = 20, Agility = -5 }));
 
         public static Weapon DragonClaw = new Weapon
         ("Dragon Claw",
@@ -193,7 +193,7 @@ namespace Game.Items
             damage: 65,
             critChance: 45,
             critMult: 2.3F,
-            new Stats() { Strength = 35, Agility = 10, Intelligence = -5 }));
+            new Stats(false) { Strength = 35, Agility = 10, Intelligence = -5 }));
 
         // All Heavy Weapons
 
@@ -205,7 +205,7 @@ namespace Game.Items
             damage: 40,
             critChance: 20,
             critMult: 2.0F,
-            new Stats() { Strength = 30, Agility = -10, Intelligence = -5 }));
+            new Stats(false) { Strength = 30, Agility = -10, Intelligence = -5 }));
 
         // All Bows
 
@@ -254,7 +254,7 @@ namespace Game.Items
         rarity: "Common",
         new WeaponStats(
             0, 0, 0, // Magic wand doesn't have damage, crit, etc.
-            new Stats()
+            new Stats(false)
             {
                 SpellAmplify = 0,
                 ManaCostDecrease = 0
@@ -266,7 +266,7 @@ namespace Game.Items
         ("Spell Book",
         "Default book used for storing many spells and their combos.",
         rarity: "Common",
-        new Stats());
+        new Stats(false));
 
     }
 }

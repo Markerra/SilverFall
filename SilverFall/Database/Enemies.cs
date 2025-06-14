@@ -14,7 +14,6 @@ namespace Game.Enemies
                 hpRegen: 3,
                 baseMana: 0,
                 manaRegen: 0,
-                crit: 20,
                 evasion: 10,
                 def: 0
             ),
@@ -34,7 +33,6 @@ namespace Game.Enemies
                 hpRegen: 4,
                 baseMana: 90,
                 manaRegen: 2.5f,
-                crit: 16,
                 evasion: 3,
                 def: 0
             ),
@@ -54,7 +52,6 @@ namespace Game.Enemies
                 hpRegen: 7,
                 baseMana: 140,
                 manaRegen: 3,
-                crit: 20,
                 evasion: 0,
                 def: 8
             ),
@@ -74,7 +71,6 @@ namespace Game.Enemies
                 hpRegen: 6,
                 baseMana: 555,
                 manaRegen: 12.5f,
-                crit: 40,
                 evasion: 30,
                 def: 10
             ),

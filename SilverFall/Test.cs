@@ -11,8 +11,10 @@ namespace Game
             Console.Clear();
             GameManager.Player.AddItem(Items.Database.MagicWand);
             GameManager.Player.AddItem(Items.Database.ShortSword);
+            GameManager.Player.AddItem(Items.Database.BronzeTrinket);
+            GameManager.Player.AddItem(Items.Database.IronHelmet);
             GameManager.Player.AddItem(Items.Database.SpellBook);
-            GameManager.Player.Equip("Short Sword");
+            GameManager.Player.Equip("Magic Wand");
             GameManager.Player.Equip("Spell Book");
             
             SpellBook? book = GameManager.Player.Equipment.SpellBook;

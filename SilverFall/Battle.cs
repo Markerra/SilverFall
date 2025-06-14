@@ -8,6 +8,20 @@ namespace Game
         public int nAttackerTurn = 1;
         public int nTargetTurn = 1;
         public Entity eTurn;
+        public enum BattleAction
+        {
+            None,
+            Attack,
+            Block,
+            SelectSpell,
+            Inventory,
+            Equipment,
+            ShowAttackerStats,
+            ShowTargetStats
+        }
+
+        public static int TurnTime = 30; 
+
         public Battle(Entity attacker, Enemy target)
         {
             Attacker = attacker;
@@ -28,7 +42,7 @@ namespace Game
 
                 // Attacker's turn
                 if (attackerWeapon != null)
-                { eTurn = Attacker; attackerWeapon.CombatStyle.MakeTurn(this, Attacker, Target); } // Make a turn
+                { eTurn = Attacker; MakeTurn(this, Attacker, Target); } // Make a turn
                 else { throw new NullReferenceException($"Attacker {Attacker.Name} doesn't have any weapon equipped!"); }
 
                 Thread.Sleep(10); // Small Delay
@@ -37,9 +51,9 @@ namespace Game
 
                 // Target's turn
                 if (targetWeapon != null)
-                { eTurn = Target; targetWeapon.CombatStyle.MakeTurn(this, Target, Attacker, AI: true); } // Make a turn
+                { eTurn = Target; MakeTurn(this, Target, Attacker, AI: true); } // Make a turn
                 else { throw new NullReferenceException($"Attacker {Target.Name} doesn't have any weapon equipped!"); }
-           
+
                 Thread.Sleep(10); // Small Delay
             }
         }
@@ -65,7 +79,8 @@ namespace Game
                 Console.SetCursorPosition(0, countdownLine);
                 Console.Write(display);
 
-                Thread.Sleep(8);
+                UI.Battle.countdownLine = countdownLine;
+                Thread.Sleep(50); // Add more delay for correctly updated UI
             }
             Console.CursorVisible = true;
         }
@@ -78,7 +93,7 @@ namespace Game
             // Start countdown in a background task
             var timerTask = Task.Run(() =>
             {
-                Thread.Sleep(5); // Add delay for other UI displays correctly
+                Thread.Sleep(15); // Add delay for other UI displays correctly
                 StartCountdown(seconds, () => timeUp);
                 timeUp = true;
             });
@@ -86,62 +101,62 @@ namespace Game
             // The playerActionLoop receives a function to check if time is up
             playerActionLoop(
                 () => (DateTime.Now - turnStart).TotalSeconds >= seconds || timeUp,
-                () => {
+                () =>
+                {
                     // endTurn() method
                     timeUp = true;
-                    Console.Write(""); 
-                    
                 });
 
             timeUp = true; // Ensure timer stops if player ends early
             timerTask.Wait();
         }
 
-        public enum BattleAction
-        {
-            None,
-            Attack,
-            Block,
-            SelectSpell,
-            Inventory,
-            Equipment
-        }
-
-    }
-
-    interface ICombatStyle
-    {
-        void MakeTurn(Battle battle, Entity attacker, Entity target, bool AI = false);
-    }
-
-    // Logic for Knight class combat
-    class KnightCombat : ICombatStyle
-    {
-        public void MakeTurn(Battle battle, Entity attacker, Entity target, bool AI)
+        public void MakeTurn(Battle battle, Entity attacker, Entity target, bool AI = false)
         {
             if (battle == null) { throw new NullReferenceException("Can't make a turn when battle isn't started"); }
             if (!attacker.IsInBattle() || !target.IsInBattle()) { throw new ArgumentException("Can't make a turn when attacker/target isn't in a battle"); }
+
+            // Regen hp, mand, etc. here >>
+
             if (attacker is Player player)
             {
-                Battle.TimedPlayerTurn(30, (isTimeUp, endTurn) =>
+                TimedPlayerTurn(TurnTime, (isTimeUp, endTurn) =>
                 {
+                    UI.Battle.ShowBattleInfo(battle);
+                    UI.Battle.optionsLine = Console.CursorTop;
                     while (!isTimeUp())
                     {
-                        // Per-action input logic
-
-                        UI.Battle.ShowBattleInfo(battle);
-
-                        Battle.BattleAction action = UI.Battle.ShowBattleOptions(battle, PlayerClasses.Detector(player), isTimeUp);
+                        bool clearBottomLines = true;
+                        BattleAction action = UI.Battle.ShowBattleOptions(battle, PlayerClasses.Detector(player), isTimeUp);
                         switch (action)
                         {
                             // Ending the turn before the action is needed for properly updated UI
-                            case Battle.BattleAction.Attack: endTurn(); attacker.Attack(target); return;
-                            case Battle.BattleAction.Block: GameLog.Write("Block"); endTurn(); return;
-                            case Battle.BattleAction.SelectSpell: endTurn(); attacker.Equipment.SpellBook?.SelectSpell(); break;
-                            case Battle.BattleAction.Equipment: GameLog.Write("Equipment"); break;
-                            case Battle.BattleAction.Inventory: GameLog.Write("Inventory"); break;
-                            default: endTurn(); return; // None - skips the timer
+                            case BattleAction.Attack:
+                                endTurn();
+                                Console.Write("\n"); attacker.Attack(target);
+                                Console.Write("\n"); UI.Generic.PressAnyKey();
+                                break;
+                            case BattleAction.Block: GameLog.Write("Block"); endTurn(); break;
+                            case BattleAction.SelectSpell:
+                                endTurn();
+                                Console.Write("\n"); attacker.Equipment.SpellBook?.SelectSpell();
+                                Console.Write("\n"); UI.Generic.PressAnyKey();
+                                break;
+                            case BattleAction.Equipment:
+                                clearBottomLines = false;
+                                //Console.Write("\n");
+                                //UI.Battle.ShowInventory(attacker, isTimeUp); << Replace on ShowEquipment
+                                break;
+                            case BattleAction.Inventory:
+                                clearBottomLines = false;
+                                Console.Write("\n");
+                                UI.Battle.ShowInventory(attacker, isTimeUp); // NOT FINISHED
+                                break;
+                            case BattleAction.ShowAttackerStats: UI.Battle.ShowAttackerInfo(battle); break;
+                            case BattleAction.ShowTargetStats: UI.Battle.ShowTargetInfo(battle); break;
+                            case BattleAction.None: endTurn(); return; // None - skips the timer
                         }
+                        if (clearBottomLines) { UI.Generic.ClearLines(4); }
                     }
                     endTurn(); return; // Time's up
                 });
@@ -160,46 +175,6 @@ namespace Game
             battle.nTurn++;
             GameLog.Write($"End of {battle.eTurn.Name}'s turn");
         }
-    }
 
-    // Logic for Archer class combat
-    class ArcherCombat : ICombatStyle
-    {
-        public void MakeTurn(Battle battle, Entity attacker, Entity target, bool AI)
-        {
-            if (attacker is Player || !AI)
-            {
-                Battle.TimedPlayerTurn(30, (isTimeUp, endTurn) =>
-                {
-                    // Per-action input logic
-                    
-                });
-                Console.ReadKey();
-            }
-            else
-            {
-                // AI makes decision without timer
-            }
-        }
-    }
-
-    // Logic for Magician class combat
-    class MagicianCombat : ICombatStyle
-    {
-        public void MakeTurn(Battle battle, Entity attacker, Entity target, bool AI)
-        {
-            if (attacker is Player || !AI)
-            {
-                Battle.TimedPlayerTurn(30, (isTimeUp, endTurn) =>
-                {
-                    // Per-action input logic
-                });
-                Console.ReadKey();
-            }
-            else
-            {
-                // AI makes decision without timer
-            }
-        }
     }
 }

@@ -8,6 +8,8 @@ namespace Game
         public string Class = PlayerClasses.Knight;
         public Player(Stats stats, string name) : base(stats, name, 1)
         {
+            Stats = stats;
+            Name = name;
             Inventory = new List<Item>();
         }
 

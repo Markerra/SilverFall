@@ -10,6 +10,11 @@ namespace Game.UI
             Console.WriteLine(Localization.Get("UI_PressAnyKey"));
             Console.ReadKey(true);
         }
+
+        public static void ClearLines(int lines)
+        {
+            for (int i = 0; i < lines; i++) { Console.WriteLine(new string(' ', Console.WindowWidth)); }
+        }
     }
 
     static class MainMenu
@@ -27,7 +32,7 @@ namespace Game.UI
                 Console.WriteLine($"2. {Localization.Get("MainMenuNewGame")}");
                 Console.WriteLine($"3. {Localization.Get("MainMenuOptions")}");
                 Console.WriteLine($"4. {Localization.Get("MainMenuExit")}");
-                Console.Write(Localization.Get("UI_SelectOption"));
+                Console.Write("\n" + Localization.Get("UI_SelectOption"));
                 string input = Console.ReadKey(true).KeyChar.ToString();
                 switch (input)
                 {
@@ -85,7 +90,7 @@ namespace Game.UI
                 Console.WriteLine($"1. {Localization.Get("MainMenuNewGame")}");
                 Console.WriteLine($"2. {Localization.Get("MainMenuOptions")}");
                 Console.WriteLine($"3. {Localization.Get("MainMenuExit")}");
-                Console.Write(Localization.Get("UI_SelectOption"));
+                Console.Write("\n" + Localization.Get("UI_SelectOption"));
                 string input = Console.ReadKey(true).KeyChar.ToString();
                 switch (input)
                 {
@@ -128,8 +133,8 @@ namespace Game.UI
 
             }
             Console.WriteLine($"4. {Localization.Get("UI_Return")}");
-            Console.Write(Localization.Get("UI_SelectOption"));
-            string input = Console.ReadKey(true).KeyChar.ToString();
+            Console.Write("\n" + Localization.Get("UI_SelectOption"));
+            string input = Console.ReadKey(true).KeyChar.ToString().ToUpper();
             switch (input)
             {
                 case "1":
@@ -149,6 +154,7 @@ namespace Game.UI
                     break;
                 case "3":
                     Console.Clear();
+                    Console.WriteLine("Select your language / Выберите язык");
                     Console.WriteLine("1. English");
                     Console.WriteLine("2. Русский");
                     string langIndex = Console.ReadKey(true).KeyChar.ToString();
@@ -254,7 +260,7 @@ namespace Game.UI
             loading.Start();
 
             GameManager.Stage = 0;
-            Player player = new Player(new Stats(), name);
+            Player player = new Player(new Stats(false), name);
             GameSave save = new GameSave(name, seed, player, GameManager.Stage, GameOptions.isDev);
 
             Thread.Sleep(800);
@@ -282,6 +288,27 @@ namespace Game.UI
 
     static class Battle
     {
+        public static int optionsLine;
+        public static int attackerInfoLine;
+        public static int targetInfoLine;
+        public static int countdownLine;
+        public static int inventoryLine;
+
+        private static string TimerInput(string defaultValue, Func<bool> isTimeUp)
+        {
+            string input = defaultValue;
+            // Non-blocking input loop
+            while (!isTimeUp())
+            {
+                if (Console.KeyAvailable)
+                {
+                    input = Console.ReadKey(true).KeyChar.ToString().ToUpper();
+                    break;
+                }
+                Thread.Sleep(10);
+            }
+            return input;
+        }
         private static Game.Battle.BattleAction _showKnigtOptions(Entity attacker, Func<bool> isTimeUp)
         {
             Weapon? weapon = attacker.Equipment.Weapon;
@@ -316,56 +343,39 @@ namespace Game.UI
                 Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
 
-            // Waiting for user Input
-            int errorTop = Console.CursorTop + 1; // Reserve a line for error messages
-
             while (true)
             {
-                Console.SetCursorPosition(0, errorTop);
-                Console.Write(new string(' ', Localization.Get("UI_SelectOption").Length)); // Clear previous error
-                Console.SetCursorPosition(0, errorTop - 1); // Move back to input line
-
+                int errorLine = countdownLine - 2; // Reserve a line for action messages
                 Console.Write("\n");
                 Console.WriteLine(Localization.Get("UI_SelectOption"));
 
-                string input = "5";
-                // Non-blocking input loop
-                while (!isTimeUp())
-                {
-                    if (Console.KeyAvailable)
-                    {
-                        input = Console.ReadKey(true).KeyChar.ToString();
-                        break;
-                    }
-                    Thread.Sleep(10);
-                }
+                string input = TimerInput("5", isTimeUp);
 
                 switch (input)
                 {
                     case "1":
                         if (weapon != null)
-                            {
-                            Console.Write("Attack".PadRight(Console.WindowWidth));
+                        {
+                            _printAction(errorLine, Localization.Get("BattleActionAttackPreview"));
                             return Game.Battle.BattleAction.Attack;
                         }
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("BattleNoWeapon").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("BattleNoWeapon"));
                         break;
                     case "2":
                         if (shield != null)
                         {
-                            Console.Write("Block".PadRight(Console.WindowWidth));
+                            _printAction(errorLine, Localization.Get("BattleActionBlockPreview"));
                             return Game.Battle.BattleAction.Block;
                         }
-                        Console.SetCursorPosition(Localization.Get("UI_SelectOption").Length, errorTop);
-                        Console.Write(Localization.Get("BattleNoShield").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("BattleNoShield"));
                         break;
                     case "3": return Game.Battle.BattleAction.Inventory;
                     case "4": return Game.Battle.BattleAction.Equipment;
                     case "5": return Game.Battle.BattleAction.None;
+                    case "A": return Game.Battle.BattleAction.ShowAttackerStats;
+                    case "E": return Game.Battle.BattleAction.ShowTargetStats;
                     default:
-                        Console.SetCursorPosition(Localization.Get("UI_SelectOption").Length, errorTop);
-                        Console.Write(Localization.Get("UI_InvalidOption").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("UI_InvalidOption"));
                         break;
                 }
             }
@@ -377,59 +387,44 @@ namespace Game.UI
 
             if (bow == null)
             {
-                Console.WriteLine($"2. {Localization.Get("BattleActionInventory")}");
-                Console.WriteLine($"3. {Localization.Get("BattleActionEquipment")}");
-                Console.WriteLine($"4. {Localization.Get("BattleActionNone")}");
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
             else
             {
                 Console.WriteLine($"1. {Localization.Get("BattleActionAttack", bow.Name)}");
-                Console.WriteLine($"2. {Localization.Get("BattleActionInventory")}");
-                Console.WriteLine($"3. {Localization.Get("BattleActionEquipment")}");
-                Console.WriteLine($"4. {Localization.Get("BattleActionNone")}");
+                // Here add try to evade enemy's Attack
+                Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
+                Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
+                Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
-
-            // Waiting for user Input
-            int errorTop = Console.CursorTop + 1; // Reserve a line for error messages
 
             while (true)
             {
-                Console.SetCursorPosition(0, errorTop);
-                Console.Write(new string(' ', Console.WindowWidth)); // Clear previous error
-                Console.SetCursorPosition(0, errorTop - 1); // Move back to input line
-
+                int errorLine = countdownLine - 2; // Reserve a line for action messages
                 Console.Write("\n");
                 Console.WriteLine(Localization.Get("UI_SelectOption"));
-                
-                string input = "5";
-                // Non-blocking input loop
-                while (!isTimeUp())
-                {
-                    if (Console.KeyAvailable)
-                    {
-                        input = Console.ReadKey(true).KeyChar.ToString();
-                        break;
-                    }
-                    Thread.Sleep(10);
-                }
+
+                string input = TimerInput("5", isTimeUp);
 
                 switch (input)
                 {
                     case "1":
                         if (bow != null)
                         {
-                            Console.Write("Attack".PadRight(Console.WindowWidth));
+                            _printAction(errorLine, Localization.Get("BattleActionAttackPreview"));
                             return Game.Battle.BattleAction.Attack;
                         }
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("BattleNoWeapon").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("BattleNoWeapon"));
                         break;
-                    case "2": return Game.Battle.BattleAction.Inventory;
-                    case "3": return Game.Battle.BattleAction.Equipment;
-                    case "4": return Game.Battle.BattleAction.None;
+                    case "3": return Game.Battle.BattleAction.Inventory;
+                    case "4": return Game.Battle.BattleAction.Equipment;
+                    case "5": return Game.Battle.BattleAction.None;
+                    case "A": return Game.Battle.BattleAction.ShowAttackerStats;
+                    case "E": return Game.Battle.BattleAction.ShowTargetStats;
                     default:
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("UI_InvalidOption").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("UI_InvalidOption"));
                         break;
                 }
             }
@@ -456,67 +451,63 @@ namespace Game.UI
             else
             {
                 //Cast {spellBook.SelectedSpell.Name} using {wand.Name}
-                Console.WriteLine($"1. {Localization.Get("BattleActionCastSpell", spellBook.SelectedSpell.Name, wand.Name)}");
+                Console.WriteLine($"1. {Localization.Get("BattleActionCastSpell", spellBook.SelectedSpell.Name, spellBook.SelectedSpell.Stats.GetManaCost(spellBook.Owner), wand.Name)}");
                 Console.WriteLine($"2. {Localization.Get("BattleActionSelectSpell", spellBook.Name)}");
                 Console.WriteLine($"3. {Localization.Get("BattleActionInventory")}");
                 Console.WriteLine($"4. {Localization.Get("BattleActionEquipment")}");
                 Console.WriteLine($"5. {Localization.Get("BattleActionNone")}");
             }
 
-            // Waiting for user Input
-            int errorTop = Console.CursorTop + 1; // Reserve a line for error messages
 
             while (true)
             {
-                Console.SetCursorPosition(0, errorTop);
-                Console.Write(new string(' ', Console.WindowWidth)); // Clear previous error
-                Console.SetCursorPosition(0, errorTop - 1); // Move back to input line
-
+                int errorLine = countdownLine - 2; // Reserve a line for action messages
                 Console.Write("\n");
                 Console.WriteLine(Localization.Get("UI_SelectOption"));
-                
-                string input = "5";
-                // Non-blocking input loop
-                while (!isTimeUp())
-                {
-                    if (Console.KeyAvailable)
-                    {
-                        input = Console.ReadKey(true).KeyChar.ToString();
-                        break;
-                    }
-                    Thread.Sleep(10);
-                }
+
+                string input = TimerInput("5", isTimeUp);
 
                 switch (input)
                 {
                     case "1":
                         if (spellBook?.SelectedSpell != null)
                         {
-                            Console.Write("Cast a spell".PadRight(Console.WindowWidth));
+                            _printAction(errorLine, Localization.Get("BattleActionCastSpellPreview"));
                             return Game.Battle.BattleAction.Attack;
                         }
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("BattleNoSpell").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("BattleNoSpell"));
                         break;
                     case "2":
                         if (spellBook != null)
+                        {
+                            _printAction(errorLine, Localization.Get("BattleActionSelectSpellPreview"));
                             return Game.Battle.BattleAction.SelectSpell;
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("BattleNoSpellBook").PadRight(Console.WindowWidth));
+                        }
+                        _printAction(errorLine, Localization.Get("BattleNoSpellBook"));
                         break;
                     case "3": return Game.Battle.BattleAction.Inventory;
                     case "4": return Game.Battle.BattleAction.Equipment;
                     case "5": return Game.Battle.BattleAction.None;
+                    case "A": return Game.Battle.BattleAction.ShowAttackerStats;
+                    case "E": return Game.Battle.BattleAction.ShowTargetStats;
                     default:
-                        Console.SetCursorPosition(0, errorTop);
-                        Console.Write(Localization.Get("UI_InvalidOption").PadRight(Console.WindowWidth));
+                        _printAction(errorLine, Localization.Get("UI_InvalidOption"));
                         break;
                 }
             }
         }
 
+        private static void _printAction(int errorLine, string text)
+        {
+            Console.SetCursorPosition(Localization.Get("UI_SelectOption").Length, errorLine);
+            Console.Write(new string(' ', Console.WindowWidth)); // Clear previous action
+            Console.SetCursorPosition(Localization.Get("UI_SelectOption").Length, errorLine);
+            Console.Write(text.PadRight(Console.WindowWidth));
+        }
+
         public static Game.Battle.BattleAction ShowBattleOptions(Game.Battle battle, string playerClass, Func<bool> isTimeUp)
         {
+            Console.SetCursorPosition(0, optionsLine);
 
             Console.WriteLine(Localization.Get("BattleActions"));
 
@@ -541,16 +532,138 @@ namespace Game.UI
             Console.WriteLine(Localization.Get("BattleInfoVersus", battle.Attacker.Name, battle.Target.Name));
             Console.WriteLine(Localization.Get("BattleInfoTurn", battle.nTurn, battle.eTurn.Name));
             Console.Write("\n");
+            attackerInfoLine = Console.CursorTop;
             Console.WriteLine(Localization.Get("BattleAttackerInfo", battle.Attacker.Name,
-            Localization.Get("BattleEntityStats", battle.Attacker.Stats.Health, battle.Attacker.Stats.MaxHealth,
-            battle.Target.Stats.Mana, battle.Target.Stats.MaxMana)
+            Localization.Get("EntityStats", battle.Attacker.Stats.Health, battle.Attacker.Stats.MaxHealth,
+            battle.Attacker.Stats.Mana, battle.Attacker.Stats.MaxMana)
             + $" {Localization.Get("BattleEntityStatsHint", 'A')}"));
+            targetInfoLine = Console.CursorTop;
             Console.WriteLine(Localization.Get("BattleTargetInfo", battle.Target.Name,
-            Localization.Get("BattleEntityStats", battle.Target.Stats.Health, battle.Target.Stats.MaxHealth,
+            Localization.Get("EntityStats", battle.Target.Stats.Health, battle.Target.Stats.MaxHealth,
             battle.Target.Stats.Mana, battle.Target.Stats.MaxMana)
             + $" {Localization.Get("BattleEntityStatsHint", 'E')}"));
             Console.Write("\n");
         }
+
+        public static void ShowAttackerInfo(Game.Battle battle)
+        {
+            int left = Console.CursorLeft;
+            int top = Console.CursorTop;
+            Console.SetCursorPosition(0, attackerInfoLine);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, attackerInfoLine);
+
+            string advStats = Localization.Get("EntityAdvancedStats", battle.Attacker.Stats.Health, battle.Attacker.Stats.MaxHealth,
+            battle.Attacker.Stats.TotalHealthRegen, battle.Attacker.Stats.Mana, battle.Attacker.Stats.MaxMana, battle.Attacker.Stats.TotalManaRegen, battle.Attacker.Stats.Defense);
+
+            Console.WriteLine(Localization.Get("BattleAttackerInfo", battle.Attacker.Name, advStats));
+
+            Console.SetCursorPosition(left, top);
+        }
+
+        public static void ShowTargetInfo(Game.Battle battle)
+        {
+            int left = Console.CursorLeft;
+            int top = Console.CursorTop;
+            Console.SetCursorPosition(0, targetInfoLine);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, targetInfoLine);
+
+            string advStats = Localization.Get("EntityAdvancedStats", battle.Target.Stats.Health, battle.Target.Stats.MaxHealth,
+            battle.Target.Stats.TotalHealthRegen, battle.Attacker.Stats.Mana, battle.Target.Stats.MaxMana, battle.Target.Stats.TotalManaRegen, battle.Target.Stats.Defense);
+
+            Console.WriteLine(Localization.Get("BattleTargetInfo", battle.Target.Name, advStats));
+
+            Console.SetCursorPosition(left, top);
+        }
+
+        public static void ShowInventory(Entity entity, Func<bool> isTimeUp)
+        {
+            inventoryLine = Console.CursorTop;
+            while (true)
+            {
+                Console.SetCursorPosition(0, inventoryLine);
+                Console.WriteLine($"{entity.Name}'s Inventory:");
+                Console.WriteLine("(Press Esc to return)");
+                for (int i = 1; i <= entity.Inventory.Count; i++)
+                {
+                    Item item = entity.Inventory[i - 1];
+                    if (item.Action == null) { Console.WriteLine($" {i}. {item.Name}"); }
+                    else { Console.WriteLine($" {i}. {item.Name} [Usable]"); }
+                }
+                Console.WriteLine($"\n{Localization.Get("UI_SelectOption")}");
+                Console.CursorVisible = false;
+
+                string input = TimerInput("Escape", isTimeUp);
+
+                Console.CursorVisible = true;
+                if (int.TryParse(input, out int index) && index > 0 && index <= entity.Inventory.Count)
+                {
+                    // Clear previous lines
+                    Console.SetCursorPosition(0, inventoryLine);
+                    Generic.ClearLines(3 + entity.Inventory.Count);
+                    Console.SetCursorPosition(0, inventoryLine);
+                    Item item = entity.Inventory[index - 1];
+                    Console.WriteLine(item.Name);
+                    Console.WriteLine(item.Description);
+                    Console.WriteLine(item.Rarity);
+                    switch (item)
+                    {
+                        case MagicWand magicWand: // NOT FINISHED !!
+                            Console.WriteLine("Weapon stats:");
+                            magicWand.Stats.PrintStats();
+                            if (magicWand.BonusStats != null)
+                            {
+                                Console.WriteLine("Bonus stats:");
+                                magicWand.Stats.PrintBonusStats();
+                            }
+                            Console.WriteLine(Localization.Get("BattleActions"));
+                            Console.WriteLine("1. Equip");
+                            Console.WriteLine("Press Esc to return");
+                            break;
+                        case Weapon weapon:
+                            Console.WriteLine("Weapon stats:");
+                            weapon.Stats.PrintStats();
+                            if (weapon.BonusStats != null)
+                            {
+                                Console.WriteLine("Bonus stats:");
+                                weapon.Stats.PrintBonusStats();
+                            }
+                            Console.WriteLine(Localization.Get("BattleActions"));
+                            Console.WriteLine("1. Equip");
+                            Console.WriteLine("Press Esc to return");
+                            break;
+                        case Equipment equipment:
+                            Console.WriteLine("Stats:");
+                            equipment.BonusStats.PrintStats();
+                            Console.WriteLine(Localization.Get("BattleActions"));
+                            Console.WriteLine("1. Equip");
+                            Console.WriteLine("Press Esc to return");
+                            break;
+                        default:
+                            Console.WriteLine(Localization.Get("BattleActions"));
+                            if (item.Action != null)
+                                Console.WriteLine("1. Use");
+                            Console.WriteLine("Press Esc to return");
+                            break;
+                    }
+
+                    Console.WriteLine($"\n{Localization.Get("UI_SelectOption")}");
+                    string input2 = TimerInput("Escape", isTimeUp);
+                    switch (input2)
+                    {
+                        case "1":
+                            if (item is Equipment eq) { eq.Equip(); }
+                            else if (item.Action != null) { item.Use(); }
+                            break;
+                        case "Escape": break;
+                    }
+                }
+                else if (input == "Escape") { return; }
+                else { Console.WriteLine($"\n{Localization.Get("UI_InvalidOption")}"); }
+            }
+        }
+
     }
 
     static class Tutorial

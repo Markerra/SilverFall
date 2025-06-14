@@ -10,7 +10,7 @@
     <value>Invalid number entered.</value>
   </data>
   <data name="UI_PressAnyKey" xml:space="preserve">
-    <value>  >> Press any key to continue... </value>
+    <value> >> Press any key to continue... </value>
   </data>
   <data name="UI_Loading" xml:space="preserve">
     <value>Loading..</value>
@@ -66,6 +66,30 @@
   <data name="OptionsLang" xml:space="preserve">
     <value>Language</value>
   </data>
+  
+  <data name="EntityStats" xml:space="preserve">
+    <value>HP: {0}/{1}  MP: {2}/{3}</value>
+  </data>
+  <data name="EntityAdvancedStats" xml:space="preserve">
+    <value>HP: {0}/{1} (Regen: {2}/turn)  MP: {3}/{4} (Regen: {5}/turn)  DF: {6}%</value>
+  </data>
+  <data name="EntityDefeated" xml:space="preserve">
+    <value>{0} has been defeated!</value>
+  </data>
+
+  <data name="WeaponAttackDamageDealt" xml:space="preserve">
+    <value>{0} attacked {1} for {2} damage.</value>
+  </data>
+  <data name="WeaponAttackDamageDealtCritical" xml:space="preserve">
+    <value>{0} landed a critical hit with {1} damage!</value>
+  </data>
+  <data name="WeaponAttackTargetHealth" xml:space="preserve">
+    <value>{0} now has {1} health remaining.</value>
+  </data>
+
+  <data name="MagicWandDamageDealt" xml:space="preserve">
+    <value>{0} casts "{1}" for {2} damage.</value>
+  </data>
 
   <data name="BattleInfoVersus" xml:space="preserve">
     <value>Battle: {0} vs {1}</value>
@@ -79,9 +103,6 @@
   <data name="BattleTargetInfo" xml:space="preserve">
     <value>Enemy: {0} - {1}</value>
   </data>
-  <data name="BattleEntityStats" xml:space="preserve">
-    <value>HP: {0}/{1}  MP: {2}/{3}</value>
-  </data>
   <data name="BattleEntityStatsHint" xml:space="preserve">
     <value>(Press '{0}' to display advanced stats)</value>
   </data>
@@ -94,11 +115,11 @@
   <data name="BattleActionBlock" xml:space="preserve">
     <value>Try to block using {0} ({1}%)</value>
   </data>
+  <data name="BattleActionCastSpell" xml:space="preserve">
+    <value>Cast "{0}" ({1} MP) using {2}</value>
+  </data>
   <data name="BattleActionSelectSpell" xml:space="preserve">
     <value>Select a spell from {0}</value>
-  </data>
-  <data name="BattleActionCastSpell" xml:space="preserve">
-    <value>Cast {0} using {1}</value>
   </data>
   <data name="BattleActionInventory" xml:space="preserve">
     <value>Open inventory</value>
@@ -108,6 +129,18 @@
   </data>
   <data name="BattleActionNone" xml:space="preserve">
     <value>Do nothing (Skip timer)</value>
+  </data>
+  <data name="BattleActionAttackPreview" xml:space="preserve">
+    <value>Attack</value>
+  </data>
+  <data name="BattleActionBlockPreview" xml:space="preserve">
+    <value>Block</value>
+  </data>
+  <data name="BattleActionCastSpellPreview" xml:space="preserve">
+    <value>Cast a spell</value>
+  </data>
+  <data name="BattleActionSelectSpellPreview" xml:space="preserve">
+    <value>Select a spell</value>
   </data>
   <data name="BattleSecRemains" xml:space="preserve">
     <value>Time left: {0}s</value>
@@ -125,10 +158,10 @@
     <value>No spell selected!</value>
   </data>
 
-  <data name="spellCastingStatus" xml:space="preserve">
+  <data name="SpellCastingStatus" xml:space="preserve">
     <value>You're casting "{0}" [{1}] on {2} ({3} LVL)</value>
   </data>
-  <data name="spellCastingWrongChar" xml:space="preserve">
+  <data name="SpellCastingWrongChar" xml:space="preserve">
     <value>Wrong character spelled!</value>
   </data>
 </root>
